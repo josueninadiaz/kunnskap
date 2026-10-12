@@ -1,0 +1,117 @@
+@import 'tailwindcss';
+
+/*
+ * Tokens de diseño.
+ * Los colores se definen como variables semánticas (no "teal-700", sino "accent") y se
+ * redefinen para el modo oscuro. Todas las combinaciones texto/fondo cumplen WCAG 2.2 AA
+ * (ratios calculados el 2026-10-12; repetir el cálculo si se cambia un color).
+ */
+:root {
+  --canvas: #fafaf9;
+  --surface: #ffffff;
+  --surface-muted: #f5f5f4;
+  --fg: #1c1917;
+  --fg-muted: #57534e;
+  --border: #d6d3d1;
+  --accent: #0f766e;
+  --accent-hover: #115e59;
+  --accent-fg: #ffffff;
+  --accent-soft: #f0fdfa;
+  --accent-soft-fg: #134e4a;
+  --danger: #b91c1c;
+  --danger-soft: #fef2f2;
+  --success: #15803d;
+  --success-soft: #f0fdf4;
+  --warning: #a16207;
+  --warning-soft: #fefce8;
+  --focus: #0f766e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --canvas: #0c0a09;
+    --surface: #1c1917;
+    --surface-muted: #292524;
+    --fg: #f5f5f4;
+    --fg-muted: #a8a29e;
+    --border: #44403c;
+    --accent: #2dd4bf;
+    --accent-hover: #5eead4;
+    --accent-fg: #042f2e;
+    --accent-soft: #042f2e;
+    --accent-soft-fg: #99f6e4;
+    --danger: #f87171;
+    --danger-soft: #2a1414;
+    --success: #4ade80;
+    --success-soft: #0f2a1a;
+    --warning: #facc15;
+    --warning-soft: #2a240c;
+    --focus: #5eead4;
+  }
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-fg: var(--accent-soft-fg);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-focus: var(--focus);
+}
+
+@theme {
+  /* Fuentes del sistema: cero descargas, buena legibilidad en cualquier dispositivo. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --radius-control: 0.5rem;
+  --radius-panel: 0.75rem;
+
+  --container-content: 72rem;
+  --container-prose: 42rem;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-fg antialiased;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4 {
+    @apply text-balance font-semibold tracking-tight;
+    line-height: 1.25;
+  }
+
+  /* Foco visible y consistente para teclado en todos los elementos interactivos. */
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

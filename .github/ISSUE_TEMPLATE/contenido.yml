@@ -1,0 +1,21 @@
+name: Problema o mejora en el contenido
+description: Un error técnico, una explicación confusa o una propuesta para una lección.
+labels: ["contenido"]
+body:
+  - type: input
+    id: leccion
+    attributes:
+      label: Curso y lección
+    validations:
+      required: true
+  - type: textarea
+    id: problema
+    attributes:
+      label: ¿Qué está mal o qué se puede mejorar?
+    validations:
+      required: true
+  - type: input
+    id: fuente
+    attributes:
+      label: Fuente que lo respalda
+      description: Enlace a documentación oficial o a otra fuente fiable, si aplica.

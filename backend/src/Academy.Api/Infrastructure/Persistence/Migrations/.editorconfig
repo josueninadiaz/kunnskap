@@ -1,0 +1,4 @@
+# Código generado por EF Core: no se aplican reglas de estilo ni de análisis.
+[*.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none

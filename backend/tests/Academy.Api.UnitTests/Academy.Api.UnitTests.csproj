@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <!-- Los nombres de pruebas descriptivos usan guiones bajos. -->
+    <NoWarn>$(NoWarn);CA1707;CA2007</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3.mtp-v2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Academy.Api\Academy.Api.csproj" />
+  </ItemGroup>
+
+</Project>

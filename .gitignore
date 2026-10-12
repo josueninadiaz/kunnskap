@@ -1,0 +1,25 @@
+# Sistema y editores
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Secretos y configuración local (nunca se versionan)
+.env.local
+.env.*.local
+*.pfx
+*.key
+appsettings.*.local.json
+
+# .NET
+bin/
+obj/
+TestResults/
+*.user
+
+# Node / Vite
+node_modules/
+dist/
+coverage/
+*.log

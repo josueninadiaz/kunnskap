@@ -1,0 +1,17 @@
+name: Proponer una funcionalidad
+description: Una idea para mejorar la plataforma.
+labels: ["propuesta"]
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: ¿Qué problema resuelve?
+      description: Explica la necesidad de quien aprende, enseña o mantiene el proyecto.
+    validations:
+      required: true
+  - type: textarea
+    id: propuesta
+    attributes:
+      label: Propuesta
+    validations:
+      required: true
