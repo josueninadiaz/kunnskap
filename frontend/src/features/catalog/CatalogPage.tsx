@@ -59,7 +59,7 @@ export function CatalogPage() {
         description="Todos los cursos son gratuitos. Los marcados como «En preparación» todavía no admiten inscripciones."
       />
 
-      <div className="space-y-4 rounded-(--radius-panel) border border-border bg-surface p-4 sm:p-5">
+      <div className="space-y-4 rounded-[1.5rem] border border-border bg-surface p-4 shadow-soft sm:p-6">
         {/* La key reinicia el cuadro cuando la URL cambia (p. ej. al volver atrás). */}
         <SearchBox key={filters.q} initialQuery={filters.q} onSearch={(q) => update({ q })} />
 
@@ -138,30 +138,42 @@ export function CatalogPage() {
         ) : null}
 
         {courses.data && courses.data.items.length > 0 ? (
-          <ul className="divide-y divide-border rounded-(--radius-panel) border border-border bg-surface">
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {courses.data.items.map((course) => (
-              <li key={course.slug} className="space-y-2 p-5">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="text-sm text-fg-muted">{course.school.name}</span>
+              <li
+                key={course.slug}
+                className="group relative flex flex-col gap-3 rounded-(--radius-panel) border border-border bg-surface p-6 transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 hover:border-border-strong hover:shadow-soft"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <span className="eyebrow text-fg-muted">{course.school.name}</span>
                   <CourseStatusBadge status={course.status} />
                 </div>
-                <h2 className="text-lg">
-                  <Link to={`/cursos/${course.slug}`} className="hover:text-accent hover:underline">
+                <h2 className="text-xl font-semibold tracking-[-0.02em]">
+                  {/* El enlace cubre toda la tarjeta (after:absolute), pero su nombre accesible es el título. */}
+                  <Link
+                    to={`/cursos/${course.slug}`}
+                    className="after:absolute after:inset-0 after:rounded-(--radius-panel) group-hover:text-accent"
+                  >
                     {course.title}
                   </Link>
                 </h2>
-                <p className="text-fg-muted">{course.summary}</p>
-                <CourseFacts
-                  level={course.level}
-                  estimatedMinutes={course.estimatedMinutes}
-                  partial={course.status === 'Published' && !course.contentComplete}
-                />
-                {course.technologies.length > 0 ? (
-                  <p className="text-sm">
-                    <span className="sr-only">Tecnologías: </span>
-                    {course.technologies.map((t) => t.name).join(' · ')}
-                  </p>
-                ) : null}
+                <p className="line-clamp-3 text-[0.9375rem] text-fg-muted">{course.summary}</p>
+                <div className="mt-auto space-y-3 pt-2">
+                  <CourseFacts
+                    level={course.level}
+                    estimatedMinutes={course.estimatedMinutes}
+                    partial={course.status === 'Published' && !course.contentComplete}
+                  />
+                  {course.technologies.length > 0 ? (
+                    <ul className="flex flex-wrap gap-1.5" aria-label="Tecnologías">
+                      {course.technologies.map((t) => (
+                        <li key={t.slug} className="rounded-full bg-surface-muted px-2.5 py-0.5 text-xs font-medium">
+                          {t.name}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
               </li>
             ))}
           </ul>
@@ -214,10 +226,10 @@ function SearchBox({ initialQuery, onSearch }: { initialQuery: string; onSearch:
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Por ejemplo: lógica, React, redes…"
-            className="block min-h-11 w-full rounded-(--radius-control) border border-border-strong bg-surface px-3 py-2 text-base text-fg placeholder:text-fg-muted"
+            className="block min-h-12 w-full rounded-full border border-border-strong bg-surface px-5 py-2 text-base text-fg placeholder:text-fg-muted"
           />
         </div>
-        <Button type="submit">
+        <Button type="submit" size="lg">
           <Search aria-hidden="true" className="size-4" />
           Buscar
         </Button>

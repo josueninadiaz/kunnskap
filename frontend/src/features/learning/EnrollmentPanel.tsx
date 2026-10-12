@@ -25,17 +25,20 @@ export function EnrollmentPanel({ courseSlug, lessonSlugs }: EnrollmentPanelProp
     return <div className="min-h-24" aria-hidden="true" />
   }
 
-  const panel = 'space-y-4 rounded-(--radius-panel) border border-border bg-surface p-5'
+  const panel = 'space-y-5 rounded-(--radius-panel) border border-border bg-surface p-6 shadow-soft'
 
   if (!user.data) {
     return (
       <div className={panel}>
-        <p>
+        <p className="text-2xl font-semibold tracking-[-0.025em]">Gratis</p>
+        <p className="text-[0.9375rem] text-fg-muted">
           Puedes leer todas las lecciones sin cuenta. Si creas una cuenta gratuita, guardaremos tu progreso y podrás
           continuar donde lo dejaste.
         </p>
-        <div className="flex flex-wrap gap-3">
-          <ButtonLink to={lessonPath(courseSlug, firstLesson)}>Empezar el curso</ButtonLink>
+        <div className="grid gap-3">
+          <ButtonLink to={lessonPath(courseSlug, firstLesson)} size="lg">
+            Empezar el curso
+          </ButtonLink>
           <ButtonLink to={`/entrar?volver=${encodeURIComponent(location.pathname)}`} variant="secondary">
             Entrar para guardar mi progreso
           </ButtonLink>
@@ -56,14 +59,17 @@ export function EnrollmentPanel({ courseSlug, lessonSlugs }: EnrollmentPanelProp
   if (!data?.enrolled) {
     return (
       <div className={panel}>
-        <p>Inscríbete gratis para guardar tu progreso y continuar desde cualquier dispositivo.</p>
+        <p className="text-2xl font-semibold tracking-[-0.025em]">Gratis</p>
+        <p className="text-[0.9375rem] text-fg-muted">
+          Inscríbete para guardar tu progreso y continuar desde cualquier dispositivo.
+        </p>
         {enroll.isError ? (
           <StatusMessage tone="error" title="No se pudo completar la inscripción">
             {describeError(enroll.error)}
           </StatusMessage>
         ) : null}
-        <div className="flex flex-wrap gap-3">
-          <Button onClick={() => enroll.mutate()} disabled={enroll.isPending}>
+        <div className="grid gap-3">
+          <Button size="lg" onClick={() => enroll.mutate()} disabled={enroll.isPending}>
             {enroll.isPending ? 'Inscribiendo…' : 'Inscribirme gratis'}
           </Button>
           <ButtonLink to={lessonPath(courseSlug, firstLesson)} variant="secondary">
@@ -96,7 +102,9 @@ export function EnrollmentPanel({ courseSlug, lessonSlugs }: EnrollmentPanelProp
           className="h-2 w-full overflow-hidden rounded-full [&::-moz-progress-bar]:bg-accent [&::-webkit-progress-bar]:bg-surface-muted [&::-webkit-progress-value]:bg-accent"
         />
       </div>
-      <ButtonLink to={lessonPath(courseSlug, target)}>{completed === 0 ? 'Empezar el curso' : 'Continuar'}</ButtonLink>
+      <ButtonLink to={lessonPath(courseSlug, target)} size="lg" className="w-full">
+        {completed === 0 ? 'Empezar el curso' : 'Continuar'}
+      </ButtonLink>
     </div>
   )
 }

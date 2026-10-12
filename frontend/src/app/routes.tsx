@@ -1,4 +1,5 @@
 import type { RouteObject } from 'react-router'
+import { Page, PageLayout } from '../components/ui/Container'
 import { LoginPage } from '../features/auth/LoginPage'
 import { RegisterPage } from '../features/auth/RegisterPage'
 import { CatalogPage } from '../features/catalog/CatalogPage'
@@ -16,18 +17,28 @@ export const routes: RouteObject[] = [
     element: <RootLayout />,
     children: [
       {
-        errorElement: <RouteError />,
+        errorElement: (
+          <Page>
+            <RouteError />
+          </Page>
+        ),
         children: [
+          // A sangre completa: tienen escenas oscuras de borde a borde.
           { index: true, element: <HomePage /> },
-          { path: 'cursos', element: <CatalogPage /> },
           { path: 'cursos/:slug', element: <CourseDetailPage /> },
-          { path: 'cursos/:slug/lecciones/:lessonSlug', element: <LessonPage /> },
-          { path: 'contribuir', element: <ContributePage /> },
-          { path: 'estado', element: <StatusPage /> },
-          { path: 'entrar', element: <LoginPage /> },
-          { path: 'registro', element: <RegisterPage /> },
-          { path: 'privacidad', element: <PrivacyPage /> },
-          { path: '*', element: <NotFoundPage /> },
+          {
+            element: <PageLayout />,
+            children: [
+              { path: 'cursos', element: <CatalogPage /> },
+              { path: 'cursos/:slug/lecciones/:lessonSlug', element: <LessonPage /> },
+              { path: 'contribuir', element: <ContributePage /> },
+              { path: 'estado', element: <StatusPage /> },
+              { path: 'entrar', element: <LoginPage /> },
+              { path: 'registro', element: <RegisterPage /> },
+              { path: 'privacidad', element: <PrivacyPage /> },
+              { path: '*', element: <NotFoundPage /> },
+            ],
+          },
         ],
       },
     ],

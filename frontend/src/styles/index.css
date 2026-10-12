@@ -1,56 +1,107 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
 
 /*
- * Tokens de diseño.
- * Los colores se definen como variables semánticas (no "teal-700", sino "accent") y se
- * redefinen para el modo oscuro. Todas las combinaciones texto/fondo cumplen WCAG 2.2 AA
- * (ratios calculados el 2026-10-12; repetir el cálculo si se cambia un color).
+ * Sistema de diseño de Kunnskap.
+ *
+ * Concepto: precisión de producto (aire, tipografía grande y apretada, cabecera translúcida)
+ * con escenas oscuras "cinematográficas" para presentar cursos y estructura clara de catálogo.
+ * Neutros con un leve tono azul nórdico; acento verde aurora.
+ *
+ * Tres estados de tema: sistema (sin atributo, manda prefers-color-scheme), y elección explícita
+ * con data-theme="light" | "dark" en <html>. Todas las combinaciones texto/fondo cumplen
+ * WCAG 2.2 AA (ratios calculados el 2026-10-12; repetir el cálculo si se cambia un color).
  */
 :root {
-  --canvas: #fafaf9;
+  --canvas: #f5f6f8;
   --surface: #ffffff;
-  --surface-muted: #f5f5f4;
-  --fg: #1c1917;
-  --fg-muted: #57534e;
-  --border: #d6d3d1;
+  --surface-muted: #eceff3;
+  --fg: #0c1015;
+  --fg-muted: #545d69;
+  --border: #dfe3e8;
   /* Borde de controles de formulario: contraste ≥ 3:1 (WCAG 1.4.11). */
-  --border-strong: #78716c;
-  --accent: #0f766e;
-  --accent-hover: #115e59;
+  --border-strong: #7b8592;
+  --accent: #0a7552;
+  --accent-hover: #075c40;
   --accent-fg: #ffffff;
-  --accent-soft: #f0fdfa;
-  --accent-soft-fg: #134e4a;
-  --danger: #b91c1c;
-  --danger-soft: #fef2f2;
-  --success: #15803d;
-  --success-soft: #f0fdf4;
-  --warning: #a16207;
-  --warning-soft: #fefce8;
-  --focus: #0f766e;
+  --accent-soft: #e3f3ec;
+  --accent-soft-fg: #064a33;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --success: #127a43;
+  --success-soft: #e5f5ec;
+  --warning: #9a5b00;
+  --warning-soft: #fdf3e1;
+  --focus: #0a7552;
+  --header: rgb(245 246 248 / 0.78);
+  --shadow: 0 1px 2px rgb(12 16 21 / 0.04), 0 8px 24px -12px rgb(12 16 21 / 0.12);
+
+  /* Escena: franja oscura para portada y cabecera de curso, igual en ambos temas. */
+  --stage: #090d13;
+  --stage-raised: #121821;
+  --stage-fg: #f2f4f7;
+  --stage-muted: #a7b0bc;
+  --stage-accent: #4be3a3;
+  --stage-border: rgb(255 255 255 / 0.1);
+
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --canvas: #0c0a09;
-    --surface: #1c1917;
-    --surface-muted: #292524;
-    --fg: #f5f5f4;
-    --fg-muted: #a8a29e;
-    --border: #44403c;
-    --border-strong: #a8a29e;
-    --accent: #2dd4bf;
-    --accent-hover: #5eead4;
-    --accent-fg: #042f2e;
-    --accent-soft: #042f2e;
-    --accent-soft-fg: #99f6e4;
-    --danger: #f87171;
-    --danger-soft: #2a1414;
-    --success: #4ade80;
-    --success-soft: #0f2a1a;
-    --warning: #facc15;
-    --warning-soft: #2a240c;
-    --focus: #5eead4;
+  :root:not([data-theme='light']) {
+    --canvas: #06080b;
+    --surface: #0f1318;
+    --surface-muted: #181d24;
+    --fg: #eef1f5;
+    --fg-muted: #9aa4b1;
+    --border: #252c36;
+    --border-strong: #7d8795;
+    --accent: #4be3a3;
+    --accent-hover: #7cefc0;
+    --accent-fg: #04150e;
+    --accent-soft: #0b2a1f;
+    --accent-soft-fg: #a3f2cf;
+    --danger: #ff8a80;
+    --danger-soft: #2c1412;
+    --success: #5ee39a;
+    --success-soft: #0d2a1c;
+    --warning: #f5c04f;
+    --warning-soft: #2b2210;
+    --focus: #7cefc0;
+    --header: rgb(6 8 11 / 0.72);
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -16px rgb(0 0 0 / 0.7);
+    --stage: #0c1118;
+    --stage-raised: #151b24;
+    color-scheme: dark;
   }
+}
+
+:root[data-theme='dark'] {
+  --canvas: #06080b;
+  --surface: #0f1318;
+  --surface-muted: #181d24;
+  --fg: #eef1f5;
+  --fg-muted: #9aa4b1;
+  --border: #252c36;
+  --border-strong: #7d8795;
+  --accent: #4be3a3;
+  --accent-hover: #7cefc0;
+  --accent-fg: #04150e;
+  --accent-soft: #0b2a1f;
+  --accent-soft-fg: #a3f2cf;
+  --danger: #ff8a80;
+  --danger-soft: #2c1412;
+  --success: #5ee39a;
+  --success-soft: #0d2a1c;
+  --warning: #f5c04f;
+  --warning-soft: #2b2210;
+  --focus: #7cefc0;
+  --header: rgb(6 8 11 / 0.72);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -16px rgb(0 0 0 / 0.7);
+  --stage: #0c1118;
+  --stage-raised: #151b24;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -73,17 +124,24 @@
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
   --color-focus: var(--focus);
+  --color-header: var(--header);
+  --color-stage: var(--stage);
+  --color-stage-raised: var(--stage-raised);
+  --color-stage-fg: var(--stage-fg);
+  --color-stage-muted: var(--stage-muted);
+  --color-stage-accent: var(--stage-accent);
+  --color-stage-border: var(--stage-border);
+  --shadow-soft: var(--shadow);
 }
 
 @theme {
-  /* Fuentes del sistema: cero descargas, buena legibilidad en cualquier dispositivo. */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  --radius-control: 0.5rem;
-  --radius-panel: 0.75rem;
+  --radius-control: 0.625rem;
+  --radius-panel: 1.25rem;
 
-  --container-content: 72rem;
+  --container-content: 76rem;
   --container-prose: 42rem;
 }
 
@@ -91,23 +149,35 @@
   html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
   }
 
   body {
     @apply bg-canvas font-sans text-fg antialiased;
+    font-size: 1.0625rem;
     line-height: 1.6;
   }
 
   h1, h2, h3, h4 {
-    @apply text-balance font-semibold tracking-tight;
-    line-height: 1.25;
+    @apply font-semibold text-balance;
+    letter-spacing: -0.022em;
+    line-height: 1.15;
+  }
+
+  code, pre, kbd {
+    font-family: var(--font-mono);
   }
 
   /* Foco visible y consistente para teclado en todos los elementos interactivos. */
   :focus-visible {
-    outline: 3px solid var(--focus);
-    outline-offset: 2px;
-    border-radius: 2px;
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--accent-soft-fg);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -117,5 +187,70 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+@layer components {
+  /* Titular de escaparate: grande, apretado y con peso firme. */
+  .display {
+    font-size: clamp(2.5rem, 1.7rem + 3.4vw, 4.25rem);
+    font-weight: 650;
+    letter-spacing: -0.045em;
+    line-height: 1.02;
+  }
+
+  .headline {
+    font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.75rem);
+    font-weight: 620;
+    letter-spacing: -0.032em;
+    line-height: 1.08;
+  }
+
+  .eyebrow {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .lead {
+    font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
+    line-height: 1.5;
+    letter-spacing: -0.011em;
+  }
+
+  /* Escena oscura: el contenido dentro usa los tokens --stage-*. */
+  .stage {
+    background:
+      radial-gradient(60rem 28rem at 85% -10%, rgb(75 227 163 / 0.13), transparent 60%),
+      var(--stage);
+    color: var(--stage-fg);
+  }
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Escritura del comando del terminal: máscara que se descubre, independiente del ancho del texto. */
+@keyframes type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
   }
 }

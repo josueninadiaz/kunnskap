@@ -13,9 +13,9 @@ export function PageHeader({ title, description }: PageHeaderProps) {
   }, [title])
 
   return (
-    <div className="space-y-3 pb-8">
-      <h1 className="text-3xl sm:text-4xl">{title}</h1>
-      {description ? <p className="max-w-(--container-prose) text-lg text-fg-muted">{description}</p> : null}
+    <div className="space-y-4 pb-10">
+      <h1 className="headline">{title}</h1>
+      {description ? <p className="lead max-w-(--container-prose) text-fg-muted">{description}</p> : null}
     </div>
   )
 }

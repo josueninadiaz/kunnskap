@@ -42,6 +42,8 @@ const defaultHandlers: Record<string, Handler> = {
   'GET /api/auth/me': () => jsonResponse({ title: 'No autorizado', status: 401 }, 401),
   'GET /api/auth/antiforgery': () => jsonResponse({ token: 'token-de-prueba' }),
   'GET /api/catalog/facets': () => jsonResponse(facetsFixture),
+  // Curso destacado de la portada: por defecto no existe y la sección se oculta.
+  'GET /api/catalog/courses/programar-desde-cero-con-csharp': () => jsonResponse({ status: 404 }, 404),
 }
 
 /**

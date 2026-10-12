@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronLeft, ChevronRight, Clock } from 'lucide-react'
+import { CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Circle, Clock } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { Link, useLocation, useParams } from 'react-router'
 import { Button, ButtonLink } from '../../components/ui/Button'
@@ -7,7 +7,7 @@ import { PageHeader } from '../../components/ui/PageHeader'
 import { StatusMessage } from '../../components/ui/StatusMessage'
 import { describeError } from '../../lib/api'
 import { useCurrentUser } from '../auth/authApi'
-import { type LessonView, useLesson } from '../catalog/catalogApi'
+import { type CourseDetail, type LessonView, useCourse, useLesson } from '../catalog/catalogApi'
 import { useCourseProgress, useRecordVisit, useSetLessonCompletion } from './learningApi'
 
 export function LessonPage() {
@@ -61,9 +61,13 @@ function LessonContent({ lesson }: { lesson: LessonView }) {
   }, [enrolled, lesson.slug, recordVisit])
 
   const lessonUrl = (slug: string) => `/cursos/${lesson.courseSlug}/lecciones/${slug}`
+  const course = useCourse(lesson.courseSlug)
+  const completed = new Set(progress.data?.completedLessonSlugs ?? [])
 
   return (
-    <article className="mx-auto max-w-(--container-prose)">
+    <div className="grid gap-10 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-16">
+      {course.data ? <CourseOutline course={course.data} currentSlug={lesson.slug} completed={completed} /> : <div />}
+    <article className="min-w-0 max-w-(--container-prose)">
       <nav aria-label="Ruta de navegación" className="mb-4 text-sm text-fg-muted">
         <ol className="flex flex-wrap gap-1">
           <li>
@@ -94,7 +98,7 @@ function LessonContent({ lesson }: { lesson: LessonView }) {
         </span>
       </p>
 
-      <div className="space-y-10">
+      <div className="space-y-10 text-[1.0625rem] leading-[1.7]">
         {lesson.videoUrl ? (
           <section className="space-y-3 rounded-(--radius-panel) border border-border bg-surface p-4">
             <p>
@@ -161,6 +165,70 @@ function LessonContent({ lesson }: { lesson: LessonView }) {
         </nav>
       </div>
     </article>
+    </div>
+  )
+}
+
+/** Índice del curso: fijo al lado en escritorio, desplegable en móvil. */
+function CourseOutline({ course, currentSlug, completed }: { course: CourseDetail; currentSlug: string; completed: Set<string> }) {
+  const modules = course.modules.filter((m) => m.lessons.length > 0)
+  const total = modules.reduce((n, m) => n + m.lessons.length, 0)
+
+  const list = (
+    <ol className="space-y-6">
+      {modules.map((m) => (
+        <li key={m.title}>
+          <p className="eyebrow text-fg-muted">{m.title}</p>
+          <ol className="mt-2 space-y-0.5">
+            {m.lessons.map((l) => {
+              const current = l.slug === currentSlug
+              const done = completed.has(l.slug)
+              return (
+                <li key={l.slug}>
+                  <Link
+                    to={`/cursos/${course.slug}/lecciones/${l.slug}`}
+                    aria-current={current ? 'page' : undefined}
+                    className={`flex items-start gap-2.5 rounded-(--radius-control) px-2.5 py-2 text-[0.9375rem] leading-snug ${
+                      current ? 'bg-accent-soft font-medium text-accent-soft-fg' : 'text-fg hover:bg-surface-muted'
+                    }`}
+                  >
+                    {done ? (
+                      <CheckCircle2 aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success" />
+                    ) : (
+                      <Circle aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-fg-muted" />
+                    )}
+                    <span>
+                      {l.title}
+                      {done ? <span className="sr-only"> (completada)</span> : null}
+                    </span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ol>
+        </li>
+      ))}
+    </ol>
+  )
+
+  return (
+    <nav aria-label="Contenido del curso" className="lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)] lg:self-start lg:overflow-y-auto">
+      <details className="group rounded-(--radius-panel) border border-border bg-surface lg:hidden">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-medium [&::-webkit-details-marker]:hidden">
+          <span>
+            Contenido del curso <span className="font-normal text-fg-muted">· {total} lecciones</span>
+          </span>
+          <ChevronDown aria-hidden="true" className="size-5 text-fg-muted transition-transform group-open:rotate-180" />
+        </summary>
+        <div className="border-t border-border px-2 py-4">{list}</div>
+      </details>
+      <div className="hidden lg:block">
+        <Link to={`/cursos/${course.slug}`} className="mb-6 block font-semibold tracking-[-0.015em] hover:text-accent">
+          {course.title}
+        </Link>
+        {list}
+      </div>
+    </nav>
   )
 }
 

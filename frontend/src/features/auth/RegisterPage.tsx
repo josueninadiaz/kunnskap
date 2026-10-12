@@ -29,7 +29,7 @@ export function RegisterPage() {
   }
 
   return (
-    <section className="mx-auto max-w-md">
+    <section className="mx-auto max-w-md rounded-[1.5rem] border border-border bg-surface p-6 shadow-soft sm:p-10">
       <PageHeader
         title="Crear una cuenta"
         description="Es gratis y siempre lo será. Solo necesitamos un correo y un nombre para dirigirnos a ti."

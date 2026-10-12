@@ -67,13 +67,15 @@ Cada módulo contiene su dominio (`Domain/`), su configuración de EF (`Persiste
 | `src/components/ui/` | Componentes base del sistema de diseño |
 | `src/features/<área>/` | Páginas y lógica de cada área (catálogo, aula, panel…) |
 | `src/lib/` | Cliente HTTP (`api.ts`) y configuración |
-| `src/styles/index.css` | Tokens de diseño (colores semánticos, tipografía y radios) para los modos claro y oscuro |
+| `src/styles/index.css` | Sistema de diseño: tokens de color con tres estados de tema (sistema, claro y oscuro con `data-theme`), escenas oscuras (`.stage`), escala tipográfica (`.display`, `.headline`, `.lead`, `.eyebrow`) y tipografías Geist y Geist Mono alojadas en el propio proyecto |
 
 **Reglas:**
 
 - El estado del servidor se gestiona con TanStack Query. Cada pantalla trata explícitamente los estados de carga, error, vacío y éxito (componente `StatusMessage`).
 - No se usa `dangerouslySetInnerHTML`, y el linter lo prohíbe.
-- Solo se usan colores semánticos (`bg-accent`, `text-fg-muted`), nunca colores literales, para mantener el contraste en los dos modos.
+- Solo se usan colores semánticos (`bg-accent`, `text-fg-muted`), nunca colores literales, para mantener el contraste en los dos modos. Sobre una escena oscura se usan los tokens `stage-*`.
+- La preferencia de tema se guarda en `localStorage` (`lib/theme.ts`) y un script en `index.html` la aplica antes del primer pintado. Si el almacenamiento no está disponible, se usa el tema del sistema.
+- Las páginas con escena oscura (portada y detalle de curso) ocupan todo el ancho; el resto usa `PageLayout`.
 - No se añaden botones ni enlaces que todavía no hagan nada.
 
 ## Entorno local y observabilidad

@@ -16,12 +16,12 @@ export function SelectField({ label, options, emptyLabel, className, ...props }:
   const id = useId()
   return (
     <div className={`space-y-1.5 ${className ?? ''}`}>
-      <label htmlFor={id} className="block text-sm font-medium">
+      <label htmlFor={id} className="block text-sm font-medium text-fg-muted">
         {label}
       </label>
       <select
         id={id}
-        className="block min-h-11 w-full rounded-(--radius-control) border border-border-strong bg-surface px-3 py-2 text-base text-fg"
+        className="block min-h-11 w-full rounded-(--radius-control) border border-border-strong bg-surface px-3 py-2 text-[0.9375rem] text-fg"
         {...props}
       >
         <option value="">{emptyLabel}</option>

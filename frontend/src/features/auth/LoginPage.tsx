@@ -30,7 +30,7 @@ export function LoginPage() {
   }
 
   return (
-    <section className="mx-auto max-w-md">
+    <section className="mx-auto max-w-md rounded-[1.5rem] border border-border bg-surface p-6 shadow-soft sm:p-10">
       <PageHeader title="Iniciar sesión" description="Continúa donde lo dejaste." />
 
       <form noValidate onSubmit={handleSubmit} className="space-y-5" aria-describedby={login.isError ? 'login-error' : undefined}>

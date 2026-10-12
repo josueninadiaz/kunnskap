@@ -1,10 +1,13 @@
+import { Check, CheckCircle2, ChevronDown, Construction } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router'
 import { Button, ButtonLink } from '../../components/ui/Button'
 import { Markdown } from '../../components/ui/Markdown'
+import { Container, Page } from '../../components/ui/Container'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { StatusMessage } from '../../components/ui/StatusMessage'
-import { CheckCircle2 } from 'lucide-react'
 import { describeError } from '../../lib/api'
+import { config } from '../../lib/config'
 import { useCurrentUser } from '../auth/authApi'
 import { EnrollmentPanel } from '../learning/EnrollmentPanel'
 import { useCourseProgress } from '../learning/learningApi'
@@ -17,40 +20,48 @@ export function CourseDetailPage() {
   const { slug = '' } = useParams()
   const course = useCourse(slug)
 
-  if (course.isPending) return <StatusMessage tone="loading" title="Cargando el curso…" />
+  if (course.isPending) {
+    return (
+      <Page>
+        <StatusMessage tone="loading" title="Cargando el curso…" />
+      </Page>
+    )
+  }
 
   if (course.isError) {
     return (
-      <StatusMessage
-        tone="error"
-        title="No se pudo cargar el curso"
-        action={
-          <Button variant="secondary" onClick={() => void course.refetch()}>
-            Reintentar
-          </Button>
-        }
-      >
-        {describeError(course.error)}
-      </StatusMessage>
+      <Page>
+        <StatusMessage
+          tone="error"
+          title="No se pudo cargar el curso"
+          action={
+            <Button variant="secondary" onClick={() => void course.refetch()}>
+              Reintentar
+            </Button>
+          }
+        >
+          {describeError(course.error)}
+        </StatusMessage>
+      </Page>
     )
   }
 
   if (course.data === null) {
     return (
-      <section>
+      <Page>
         <PageHeader title="Curso no encontrado" description="Puede que la dirección sea incorrecta o que el curso ya no esté disponible." />
         <ButtonLink to="/cursos">Ver todos los cursos</ButtonLink>
-      </section>
+      </Page>
     )
   }
 
   return <CourseView course={course.data} />
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="space-y-3">
-      <h2 className="text-xl">{title}</h2>
+    <section className="space-y-5">
+      <h2 className="text-2xl font-semibold tracking-[-0.025em]">{title}</h2>
       {children}
     </section>
   )
@@ -62,136 +73,202 @@ function CourseView({ course }: { course: CourseDetail }) {
   const progress = useCourseProgress(course.slug, published && Boolean(user.data))
   const completed = new Set(progress.data?.completedLessonSlugs ?? [])
   const lessonSlugs = course.modules.flatMap((m) => m.lessons.map((l) => l.slug))
+  const lessonCount = lessonSlugs.length
+  const author = course.authors[0]
 
   return (
-    <article className="max-w-3xl">
-      <nav aria-label="Ruta de navegación" className="mb-4 text-sm text-fg-muted">
-        <ol className="flex flex-wrap gap-1">
-          <li>
-            <Link to="/cursos" className="underline hover:text-fg">
-              Cursos
-            </Link>
-            <span aria-hidden="true"> / </span>
-          </li>
-          <li>
-            <Link to={`/cursos?escuela=${course.school.slug}`} className="underline hover:text-fg">
-              {course.school.name}
-            </Link>
-          </li>
-        </ol>
-      </nav>
-
-      <div className="mb-2">
-        <CourseStatusBadge status={course.status} />
-      </div>
-      <PageHeader title={course.title} description={course.summary} />
-
-      <div className="space-y-10">
-        <CourseFacts level={course.level} estimatedMinutes={course.estimatedMinutes} partial={published && !course.contentComplete} />
-
-        {published ? <EnrollmentPanel courseSlug={course.slug} lessonSlugs={lessonSlugs} /> : null}
-
-        {course.status === 'InDevelopment' ? (
-          <StatusMessage tone="info" title="Este curso está en preparación">
-            Todavía no admite inscripciones. Aquí puedes ver lo que aprenderás y el temario previsto.
-          </StatusMessage>
-        ) : null}
-
-        <Markdown>{course.descriptionMarkdown}</Markdown>
-
-        {course.learningObjectives.length > 0 ? (
-          <Section title="Qué aprenderás">
-            <ul className="list-disc space-y-2 pl-5 marker:text-accent">
-              {course.learningObjectives.map((o) => (
-                <li key={o}>
-                  <Markdown>{o}</Markdown>
+    <article>
+      <header className="stage">
+        <Container className="py-12 sm:py-16 lg:py-20">
+          <div className="max-w-3xl space-y-6">
+            <nav aria-label="Ruta de navegación" className="text-sm text-stage-muted">
+              <ol className="flex flex-wrap gap-1">
+                <li>
+                  <Link to="/cursos" className="hover:text-stage-fg hover:underline">
+                    Cursos
+                  </Link>
+                  <span aria-hidden="true"> / </span>
                 </li>
-              ))}
-            </ul>
-          </Section>
-        ) : null}
-
-        {course.prerequisites.length > 0 ? (
-          <Section title="Requisitos previos">
-            <ul className="list-disc space-y-2 pl-5 marker:text-accent">
-              {course.prerequisites.map((p) => (
-                <li key={p}>{p}</li>
-              ))}
-            </ul>
-          </Section>
-        ) : null}
-
-        {course.modules.length > 0 ? (
-          <Section title={course.status === 'InDevelopment' ? 'Temario previsto' : 'Temario'}>
-            <ol className="space-y-4">
-              {course.modules.map((m, index) => (
-                <li key={m.title} className="border-l-2 border-border pl-4">
-                  <h3 className="font-semibold">
-                    Módulo {index + 1}. {m.title}
-                  </h3>
-                  {published && m.lessons.length === 0 ? (
-                    <p className="text-sm text-fg-muted">En preparación</p>
-                  ) : null}
-                  {m.summary ? (
-                    <div className="mt-1 text-fg-muted">
-                      <Markdown>{m.summary}</Markdown>
-                    </div>
-                  ) : null}
-                  {m.lessons.length > 0 ? (
-                    <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm">
-                      {m.lessons.map((l) => (
-                        <li key={l.slug}>
-                          <Link to={`/cursos/${course.slug}/lecciones/${l.slug}`} className="text-accent underline">
-                            {l.title}
-                          </Link>{' '}
-                          <span className="text-fg-muted">({l.estimatedMinutes} min)</span>
-                          {completed.has(l.slug) ? (
-                            <span className="ml-2 inline-flex items-center gap-1 text-success">
-                              <CheckCircle2 aria-hidden="true" className="size-4" />
-                              <span className="sr-only">Completada</span>
-                            </span>
-                          ) : null}
-                        </li>
-                      ))}
-                    </ol>
-                  ) : null}
+                <li>
+                  <Link to={`/cursos?escuela=${course.school.slug}`} className="hover:text-stage-fg hover:underline">
+                    {course.school.name}
+                  </Link>
                 </li>
-              ))}
-            </ol>
-          </Section>
-        ) : null}
+              </ol>
+            </nav>
+            <CourseStatusBadge status={course.status} />
+            <PageTitle title={course.title} />
+            <p className="lead text-stage-muted">{course.summary}</p>
+            <CourseFacts
+              level={course.level}
+              estimatedMinutes={course.estimatedMinutes}
+              partial={published && !course.contentComplete}
+              onStage
+            />
+            {author ? (
+              <div className="flex items-center gap-3 border-t border-stage-border pt-6">
+                <span
+                  aria-hidden="true"
+                  className="inline-flex size-11 items-center justify-center rounded-full bg-stage-raised text-lg font-semibold text-stage-accent ring-1 ring-stage-border"
+                >
+                  {author.charAt(0)}
+                </span>
+                <span>
+                  <span className="block text-sm text-stage-muted">Curso creado por</span>
+                  <span className="font-semibold">{course.authors.join(', ')}</span>
+                </span>
+              </div>
+            ) : null}
+          </div>
+        </Container>
+      </header>
 
-        <Section title="Detalles">
-          <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-[max-content_1fr]">
+      <Container className="grid gap-12 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16">
+        <aside className="space-y-6 lg:sticky lg:top-24 lg:order-2 lg:self-start" aria-label="Acceso al curso">
+          {published ? (
+            <EnrollmentPanel courseSlug={course.slug} lessonSlugs={lessonSlugs} />
+          ) : (
+            <div className="space-y-3 rounded-(--radius-panel) border border-border bg-surface p-6 shadow-soft">
+              <p className="flex items-center gap-2 font-semibold">
+                <Construction aria-hidden="true" className="size-5 text-warning" />
+                Este curso está en preparación
+              </p>
+              <p className="text-[0.9375rem] text-fg-muted">
+                Todavía no admite inscripciones. Aquí puedes ver lo que aprenderás y el temario previsto.
+              </p>
+            </div>
+          )}
+
+          <dl className="space-y-4 rounded-(--radius-panel) border border-border bg-surface p-6 text-[0.9375rem]">
+            {lessonCount > 0 ? <Detail term="Lecciones publicadas">{lessonCount}</Detail> : null}
+            <Detail term="Módulos">{course.modules.length}</Detail>
             {course.technologies.length > 0 ? (
-              <>
-                <dt className="font-medium">Tecnologías</dt>
-                <dd>{course.technologies.map((t) => t.name).join(', ')}</dd>
-              </>
+              <Detail term="Tecnologías">{course.technologies.map((t) => t.name).join(', ')}</Detail>
             ) : null}
-            {course.softwareVersions.length > 0 ? (
-              <>
-                <dt className="font-medium">Versiones</dt>
-                <dd>{course.softwareVersions.join(', ')}</dd>
-              </>
-            ) : null}
-            {course.authors.length > 0 ? (
-              <>
-                <dt className="font-medium">Autoría</dt>
-                <dd>{course.authors.join(', ')}</dd>
-              </>
-            ) : null}
-            <dt className="font-medium">Licencia del contenido</dt>
-            <dd>{course.licenseSpdx === 'CC-BY-SA-4.0' ? 'CC BY-SA 4.0' : course.licenseSpdx}</dd>
+            {course.softwareVersions.length > 0 ? <Detail term="Versiones">{course.softwareVersions.join(', ')}</Detail> : null}
+            <Detail term="Idioma">{course.language === 'es' ? 'Español' : course.language}</Detail>
+            <Detail term="Licencia del contenido">
+              {course.licenseSpdx === 'CC-BY-SA-4.0' ? 'CC BY-SA 4.0' : course.licenseSpdx}
+            </Detail>
             {course.lastReviewedAt ? (
-              <>
-                <dt className="font-medium">Última revisión</dt>
-                <dd>{dateFormat.format(new Date(course.lastReviewedAt))}</dd>
-              </>
+              <Detail term="Última revisión">{dateFormat.format(new Date(course.lastReviewedAt))}</Detail>
             ) : null}
+            <Detail term="Precio">Gratis</Detail>
           </dl>
-        </Section>
-      </div>
+        </aside>
+
+        <div className="min-w-0 space-y-14 lg:order-1">
+          {course.learningObjectives.length > 0 ? (
+            <section className="space-y-5 rounded-(--radius-panel) border border-border bg-surface p-6 sm:p-8">
+              <h2 className="text-2xl font-semibold tracking-[-0.025em]">Qué aprenderás</h2>
+              <ul className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
+                {course.learningObjectives.map((o) => (
+                  <li key={o} className="flex gap-3">
+                    <Check aria-hidden="true" className="mt-1 size-4 shrink-0 text-accent" />
+                    <div className="min-w-0 text-[0.9375rem]">
+                      <Markdown>{o}</Markdown>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          <div className="max-w-(--container-prose) text-lg">
+            <Markdown>{course.descriptionMarkdown}</Markdown>
+          </div>
+
+          {course.modules.length > 0 ? (
+            <Section title={published ? 'Temario' : 'Temario previsto'}>
+              <ol className="divide-y divide-border overflow-hidden rounded-(--radius-panel) border border-border bg-surface">
+                {course.modules.map((m, index) => (
+                  <li key={m.title}>
+                    <details className="group" open={index === 0}>
+                      <summary className="flex cursor-pointer list-none items-center gap-4 px-5 py-4 hover:bg-surface-muted [&::-webkit-details-marker]:hidden">
+                        <span className="w-6 shrink-0 font-mono text-sm text-fg-muted tabular-nums">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <h3 className="font-semibold">
+                            Módulo {index + 1}. {m.title}
+                          </h3>
+                          <span className="text-sm text-fg-muted">
+                            {m.lessons.length > 0
+                              ? `${m.lessons.length} ${m.lessons.length === 1 ? 'lección' : 'lecciones'}`
+                              : published
+                                ? 'En preparación'
+                                : 'Contenido previsto'}
+                          </span>
+                        </span>
+                        <ChevronDown aria-hidden="true" className="size-5 shrink-0 text-fg-muted transition-transform group-open:rotate-180" />
+                      </summary>
+                      <div className="space-y-4 px-5 pb-5 pl-15">
+                        {m.summary ? (
+                          <div className="text-[0.9375rem] text-fg-muted">
+                            <Markdown>{m.summary}</Markdown>
+                          </div>
+                        ) : null}
+                        {m.lessons.length > 0 ? (
+                          <ol className="space-y-2">
+                            {m.lessons.map((l) => (
+                              <li key={l.slug} className="flex items-baseline justify-between gap-4 text-[0.9375rem]">
+                                <span className="flex items-baseline gap-2">
+                                  {completed.has(l.slug) ? (
+                                    <span className="inline-flex translate-y-0.5 text-success">
+                                      <CheckCircle2 aria-hidden="true" className="size-4" />
+                                      <span className="sr-only">Completada</span>
+                                    </span>
+                                  ) : null}
+                                  <Link to={`/cursos/${course.slug}/lecciones/${l.slug}`} className="text-accent hover:underline">
+                                    {l.title}
+                                  </Link>
+                                </span>
+                                <span className="shrink-0 text-sm text-fg-muted tabular-nums">{l.estimatedMinutes} min</span>
+                              </li>
+                            ))}
+                          </ol>
+                        ) : null}
+                      </div>
+                    </details>
+                  </li>
+                ))}
+              </ol>
+            </Section>
+          ) : null}
+
+          {course.prerequisites.length > 0 ? (
+            <Section title="Requisitos previos">
+              <ul className="max-w-(--container-prose) space-y-3">
+                {course.prerequisites.map((p) => (
+                  <li key={p} className="flex gap-3">
+                    <span aria-hidden="true" className="mt-2.5 size-1.5 shrink-0 rounded-full bg-accent" />
+                    <span>{p}</span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          ) : null}
+        </div>
+      </Container>
     </article>
+  )
+}
+
+/** h1 del curso con el tamaño de escaparate; también actualiza el título del documento. */
+function PageTitle({ title }: { title: string }) {
+  return (
+    <>
+      <title>{`${title} · ${config.platformName}`}</title>
+      <h1 className="display text-[clamp(2.25rem,1.6rem+3vw,4rem)]">{title}</h1>
+    </>
+  )
+}
+
+function Detail({ term, children }: { term: string; children: ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <dt className="text-fg-muted">{term}</dt>
+      <dd className="text-right font-medium">{children}</dd>
+    </div>
   )
 }
