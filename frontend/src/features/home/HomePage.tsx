@@ -1,5 +1,4 @@
 import {
-  ArrowRight,
   BookOpenCheck,
   Brain,
   Code2,
@@ -69,7 +68,7 @@ function courseCountLabel(published: number, inDevelopment: number): string {
   const parts: string[] = []
   if (published > 0) parts.push(published === 1 ? '1 curso disponible' : `${published} cursos disponibles`)
   if (inDevelopment > 0) parts.push(inDevelopment === 1 ? '1 en preparación' : `${inDevelopment} en preparación`)
-  return parts.join(' · ') || 'Sin cursos todavía'
+  return parts.join(', ') || 'Sin cursos todavía'
 }
 
 export function HomePage() {
@@ -115,11 +114,9 @@ export function HomePage() {
           <dl className="mt-12 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
             {principles.map(({ Icon, title, text }) => (
               <div key={title} className="space-y-3">
-                <dt className="space-y-4">
-                  <span className="inline-flex size-11 items-center justify-center rounded-full bg-accent-soft text-accent-soft-fg">
-                    <Icon aria-hidden="true" className="size-5" />
-                  </span>
-                  <span className="block text-lg font-semibold tracking-[-0.015em]">{title}</span>
+                <dt className="space-y-3">
+                  <Icon aria-hidden="true" className="size-6 text-accent" strokeWidth={1.75} />
+                  <span className="block font-display text-xl font-semibold tracking-[-0.02em]">{title}</span>
                 </dt>
                 <dd className="text-fg-muted">{text}</dd>
               </div>
@@ -142,8 +139,8 @@ export function HomePage() {
                 cursos sueltos.
               </p>
             </div>
-            <Link to="/cursos" className="inline-flex items-center gap-1.5 font-medium text-accent hover:underline">
-              Ver todos los cursos <ArrowRight aria-hidden="true" className="size-4" />
+            <Link to="/cursos" className="font-medium text-accent underline-offset-4 hover:underline">
+              Ver todos los cursos
             </Link>
           </div>
           <div className="mt-12">
@@ -199,7 +196,9 @@ function FeaturedCourse() {
     <section aria-labelledby="featured-title" className="border-y border-border bg-surface py-20 sm:py-28">
       <Container className="grid gap-14 lg:grid-cols-[1fr_1fr] lg:gap-20">
         <div className="space-y-6">
-          <p className="eyebrow text-accent">Primer curso{c.status === 'InDevelopment' ? ' · en preparación' : ''}</p>
+          <p className="eyebrow text-accent">
+            {c.status === 'InDevelopment' ? 'Primer curso, en preparación' : 'Primer curso'}
+          </p>
           <h2 id="featured-title" className="headline">
             {c.title}
           </h2>
@@ -231,8 +230,8 @@ function FeaturedCourse() {
           <ol className="mt-4 divide-y divide-border border-y border-border">
             {c.modules.map((m, i) => (
               <li key={m.title} className="flex items-baseline gap-5 py-4">
-                <span className="w-6 shrink-0 font-mono text-sm text-fg-muted tabular-nums">{String(i + 1).padStart(2, '0')}</span>
-                <span className="text-lg font-medium tracking-[-0.01em]">{m.title}</span>
+                <span className="w-5 shrink-0 text-right text-fg-muted tabular-nums">{i + 1}</span>
+                <span className="font-display text-xl font-medium tracking-[-0.015em]">{m.title}</span>
               </li>
             ))}
           </ol>
@@ -259,21 +258,23 @@ function SchoolList() {
   }
 
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="border-t border-border">
       {facets.data.schools.map((school) => {
         const Icon = schoolIcons[school.slug] ?? GraduationCap
         return (
-          <li key={school.slug}>
+          <li key={school.slug} className="border-b border-border">
             <Link
               to={`/cursos?escuela=${school.slug}`}
-              className="group flex h-full flex-col gap-4 rounded-(--radius-panel) border border-border bg-surface p-6 transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 hover:border-border-strong hover:shadow-soft"
+              className="group grid gap-x-10 gap-y-2 py-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_auto] md:items-baseline"
             >
-              <span className="inline-flex size-11 items-center justify-center rounded-full bg-accent-soft text-accent-soft-fg">
-                <Icon aria-hidden="true" className="size-5" />
+              <span className="flex items-baseline gap-3">
+                <Icon aria-hidden="true" className="size-5 shrink-0 translate-y-0.5 text-accent" strokeWidth={1.75} />
+                <span className="font-display text-2xl font-semibold tracking-[-0.025em] group-hover:text-accent sm:text-3xl">
+                  {school.name}
+                </span>
               </span>
-              <span className="text-xl font-semibold tracking-[-0.02em] group-hover:text-accent">{school.name}</span>
-              <span className="text-[0.9375rem] text-fg-muted">{school.description}</span>
-              <span className="mt-auto pt-2 text-sm font-medium text-fg-muted">
+              <span className="text-fg-muted md:pl-0 pl-8">{school.description}</span>
+              <span className="pl-8 text-sm font-medium whitespace-nowrap text-fg-muted md:pl-0 md:text-right">
                 {courseCountLabel(school.publishedCourses, school.coursesInDevelopment)}
               </span>
             </Link>

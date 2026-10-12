@@ -61,7 +61,7 @@ export function CourseDetailPage() {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="space-y-5">
-      <h2 className="text-2xl font-semibold tracking-[-0.025em]">{title}</h2>
+      <h2 className="text-[1.75rem] font-semibold tracking-[-0.025em]">{title}</h2>
       {children}
     </section>
   )
@@ -160,7 +160,7 @@ function CourseView({ course }: { course: CourseDetail }) {
         <div className="min-w-0 space-y-14 lg:order-1">
           {course.learningObjectives.length > 0 ? (
             <section className="space-y-5 rounded-(--radius-panel) border border-border bg-surface p-6 sm:p-8">
-              <h2 className="text-2xl font-semibold tracking-[-0.025em]">Qué aprenderás</h2>
+              <h2 className="text-[1.75rem] font-semibold tracking-[-0.025em]">Qué aprenderás</h2>
               <ul className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
                 {course.learningObjectives.map((o) => (
                   <li key={o} className="flex gap-3">
@@ -185,9 +185,7 @@ function CourseView({ course }: { course: CourseDetail }) {
                   <li key={m.title}>
                     <details className="group" open={index === 0}>
                       <summary className="flex cursor-pointer list-none items-center gap-4 px-5 py-4 hover:bg-surface-muted [&::-webkit-details-marker]:hidden">
-                        <span className="w-6 shrink-0 font-mono text-sm text-fg-muted tabular-nums">
-                          {String(index + 1).padStart(2, '0')}
-                        </span>
+                        <span className="w-5 shrink-0 text-right text-fg-muted tabular-nums">{index + 1}</span>
                         <span className="min-w-0 flex-1">
                           <h3 className="font-semibold">
                             Módulo {index + 1}. {m.title}

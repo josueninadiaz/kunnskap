@@ -39,9 +39,10 @@ export function CourseFacts({ level, estimatedMinutes, partial = false, onStage 
         <li className="inline-flex items-center gap-1.5">
           <Clock aria-hidden="true" className="size-4" />
           <span className="sr-only">Duración estimada:</span> {duration}
-          {partial ? ' de contenido publicado · más módulos en preparación' : null}
+          {partial ? ' publicadas' : null}
         </li>
       ) : null}
+      {partial ? <li>Más módulos en preparación</li> : null}
     </ul>
   )
 }

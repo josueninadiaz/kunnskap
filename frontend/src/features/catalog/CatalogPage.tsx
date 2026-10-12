@@ -142,13 +142,13 @@ export function CatalogPage() {
             {courses.data.items.map((course) => (
               <li
                 key={course.slug}
-                className="group relative flex flex-col gap-3 rounded-(--radius-panel) border border-border bg-surface p-6 transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 hover:border-border-strong hover:shadow-soft"
+                className="group relative flex flex-col gap-3 rounded-(--radius-panel) border border-border bg-surface p-6 transition-colors hover:border-border-strong"
               >
                 <div className="flex items-start justify-between gap-3">
                   <span className="eyebrow text-fg-muted">{course.school.name}</span>
                   <CourseStatusBadge status={course.status} />
                 </div>
-                <h2 className="text-xl font-semibold tracking-[-0.02em]">
+                <h2 className="text-[1.375rem] leading-tight font-semibold tracking-[-0.022em]">
                   {/* El enlace cubre toda la tarjeta (after:absolute), pero su nombre accesible es el título. */}
                   <Link
                     to={`/cursos/${course.slug}`}

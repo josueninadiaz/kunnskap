@@ -1,13 +1,15 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/geist';
 @import '@fontsource-variable/geist-mono';
+@import '@fontsource-variable/familjen-grotesk';
 
 /*
  * Sistema de diseño de Kunnskap.
  *
- * Concepto: precisión de producto (aire, tipografía grande y apretada, cabecera translúcida)
- * con escenas oscuras "cinematográficas" para presentar cursos y estructura clara de catálogo.
- * Neutros con un leve tono azul nórdico; acento verde aurora.
+ * Concepto: diseño escandinavo funcional. Precisión de producto (aire, cabecera translúcida),
+ * escenas de "noche polar" con una aurora tenue para presentar cursos, y titulares en Familjen
+ * Grotesk (fundición sueca) sobre texto en Geist. Lo atrevido se concentra en la portada;
+ * el resto es sobrio: etiquetas en minúscula, sin tarjetas decorativas ni adornos.
  *
  * Tres estados de tema: sistema (sin atributo, manda prefers-color-scheme), y elección explícita
  * con data-theme="light" | "dark" en <html>. Todas las combinaciones texto/fondo cumplen
@@ -38,69 +40,65 @@
   --shadow: 0 1px 2px rgb(12 16 21 / 0.04), 0 8px 24px -12px rgb(12 16 21 / 0.12);
 
   /* Escena: franja oscura para portada y cabecera de curso, igual en ambos temas. */
-  --stage: #090d13;
-  --stage-raised: #121821;
-  --stage-fg: #f2f4f7;
-  --stage-muted: #a7b0bc;
-  --stage-accent: #4be3a3;
-  --stage-border: rgb(255 255 255 / 0.1);
+  --stage: #0b1b2c;
+  --stage-raised: #13283d;
+  --stage-fg: #eef3f8;
+  --stage-muted: #a8b7c8;
+  --stage-accent: #6fe3b4;
+  --stage-border: rgb(255 255 255 / 0.12);
 
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --canvas: #06080b;
-    --surface: #0f1318;
-    --surface-muted: #181d24;
-    --fg: #eef1f5;
-    --fg-muted: #9aa4b1;
-    --border: #252c36;
-    --border-strong: #7d8795;
-    --accent: #4be3a3;
-    --accent-hover: #7cefc0;
+    --canvas: #070d15;
+    --surface: #0e1824;
+    --surface-muted: #152231;
+    --fg: #ecf1f6;
+    --fg-muted: #9babbd;
+    --border: #223245;
+    --border-strong: #7f90a4;
+    --accent: #6fe3b4;
+    --accent-hover: #93ecc8;
     --accent-fg: #04150e;
-    --accent-soft: #0b2a1f;
-    --accent-soft-fg: #a3f2cf;
+    --accent-soft: #0d2b26;
+    --accent-soft-fg: #a6f0d2;
     --danger: #ff8a80;
     --danger-soft: #2c1412;
     --success: #5ee39a;
     --success-soft: #0d2a1c;
     --warning: #f5c04f;
     --warning-soft: #2b2210;
-    --focus: #7cefc0;
-    --header: rgb(6 8 11 / 0.72);
+    --focus: #93ecc8;
+    --header: rgb(7 13 21 / 0.74);
     --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -16px rgb(0 0 0 / 0.7);
-    --stage: #0c1118;
-    --stage-raised: #151b24;
     color-scheme: dark;
   }
 }
 
 :root[data-theme='dark'] {
-  --canvas: #06080b;
-  --surface: #0f1318;
-  --surface-muted: #181d24;
-  --fg: #eef1f5;
-  --fg-muted: #9aa4b1;
-  --border: #252c36;
-  --border-strong: #7d8795;
-  --accent: #4be3a3;
-  --accent-hover: #7cefc0;
+  --canvas: #070d15;
+  --surface: #0e1824;
+  --surface-muted: #152231;
+  --fg: #ecf1f6;
+  --fg-muted: #9babbd;
+  --border: #223245;
+  --border-strong: #7f90a4;
+  --accent: #6fe3b4;
+  --accent-hover: #93ecc8;
   --accent-fg: #04150e;
-  --accent-soft: #0b2a1f;
-  --accent-soft-fg: #a3f2cf;
+  --accent-soft: #0d2b26;
+  --accent-soft-fg: #a6f0d2;
   --danger: #ff8a80;
   --danger-soft: #2c1412;
   --success: #5ee39a;
   --success-soft: #0d2a1c;
   --warning: #f5c04f;
   --warning-soft: #2b2210;
-  --focus: #7cefc0;
-  --header: rgb(6 8 11 / 0.72);
+  --focus: #93ecc8;
+  --header: rgb(7 13 21 / 0.74);
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -16px rgb(0 0 0 / 0.7);
-  --stage: #0c1118;
-  --stage-raised: #151b24;
   color-scheme: dark;
 }
 
@@ -137,6 +135,7 @@
 @theme {
   --font-sans: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-display: 'Familjen Grotesk Variable', 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
 
   --radius-control: 0.625rem;
   --radius-panel: 1.25rem;
@@ -159,7 +158,7 @@
   }
 
   h1, h2, h3, h4 {
-    @apply font-semibold text-balance;
+    @apply font-display font-semibold text-balance;
     letter-spacing: -0.022em;
     line-height: 1.15;
   }
@@ -193,24 +192,25 @@
 @layer components {
   /* Titular de escaparate: grande, apretado y con peso firme. */
   .display {
-    font-size: clamp(2.5rem, 1.7rem + 3.4vw, 4.25rem);
-    font-weight: 650;
-    letter-spacing: -0.045em;
-    line-height: 1.02;
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 1.7rem + 3.8vw, 4.75rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1;
   }
 
   .headline {
-    font-size: clamp(1.75rem, 1.35rem + 1.6vw, 2.75rem);
-    font-weight: 620;
-    letter-spacing: -0.032em;
-    line-height: 1.08;
+    font-family: var(--font-display);
+    font-size: clamp(1.85rem, 1.4rem + 1.7vw, 2.9rem);
+    font-weight: 600;
+    letter-spacing: -0.028em;
+    line-height: 1.05;
   }
 
+  /* Etiqueta breve sobre un bloque: en minúscula normal, sin espaciado forzado. */
   .eyebrow {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
   }
 
   .lead {
@@ -221,8 +221,10 @@
 
   /* Escena oscura: el contenido dentro usa los tokens --stage-*. */
   .stage {
+    /* Aurora tenue sobre la noche polar. */
     background:
-      radial-gradient(60rem 28rem at 85% -10%, rgb(75 227 163 / 0.13), transparent 60%),
+      radial-gradient(48rem 22rem at 88% -12%, rgb(111 227 180 / 0.16), transparent 62%),
+      radial-gradient(40rem 20rem at 60% -20%, rgb(120 150 255 / 0.1), transparent 60%),
       var(--stage);
     color: var(--stage-fg);
   }

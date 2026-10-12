@@ -216,7 +216,7 @@ function CourseOutline({ course, currentSlug, completed }: { course: CourseDetai
       <details className="group rounded-(--radius-panel) border border-border bg-surface lg:hidden">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-medium [&::-webkit-details-marker]:hidden">
           <span>
-            Contenido del curso <span className="font-normal text-fg-muted">· {total} lecciones</span>
+            Contenido del curso <span className="font-normal text-fg-muted">({total} lecciones)</span>
           </span>
           <ChevronDown aria-hidden="true" className="size-5 text-fg-muted transition-transform group-open:rotate-180" />
         </summary>

@@ -85,7 +85,7 @@ describe('detalle de un curso publicado', () => {
       'href',
       '/entrar?volver=%2Fcursos%2Fcsharp',
     )
-    expect(screen.getByText(/de contenido publicado · más módulos en preparación/)).toBeInTheDocument()
+    expect(screen.getByText('Más módulos en preparación')).toBeInTheDocument()
     expect(screen.getByText('En preparación')).toBeInTheDocument()
   })
 

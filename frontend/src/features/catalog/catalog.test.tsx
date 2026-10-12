@@ -173,7 +173,7 @@ describe('inicio', () => {
 
     const link = await screen.findByRole('link', { name: /^Ciberseguridad defensiva/ })
     expect(link).toHaveAttribute('href', '/cursos?escuela=ciberseguridad')
-    expect(screen.getByText('1 curso disponible · 8 en preparación')).toBeInTheDocument()
+    expect(screen.getByText('1 curso disponible, 8 en preparación')).toBeInTheDocument()
   })
 })
 

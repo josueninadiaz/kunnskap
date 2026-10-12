@@ -3,7 +3,7 @@ import { config } from '../../lib/config'
 /** Marca: monograma «K» en trazo aurora sobre fondo de escena, y el nombre configurable. */
 export function Logo({ className = '' }: { className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 font-semibold tracking-[-0.02em] ${className}`}>
+    <span className={`inline-flex items-center gap-2.5 font-display font-semibold tracking-[-0.02em] ${className}`}>
       <svg viewBox="0 0 32 32" aria-hidden="true" className="size-7 shrink-0">
         <rect width="32" height="32" rx="8" fill="var(--stage)" />
         <path
