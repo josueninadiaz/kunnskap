@@ -43,7 +43,7 @@ describe('aplicación', () => {
 
     await userEvent.click(nav.querySelector('a[href="/contribuir"]') as HTMLElement)
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Cómo contribuir' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Cómo contribuir' })).toBeInTheDocument()
   })
 
   it('muestra una página 404 para rutas desconocidas', () => {

@@ -12,8 +12,9 @@ const ana = {
   permissions: [],
 }
 
-function header() {
-  return within(screen.getByRole('banner'))
+/** Cabecera del sitio. Espera a que exista: con rutas diferidas, la app se pinta al cargar la ruta. */
+async function header() {
+  return within(await screen.findByRole('banner'))
 }
 
 describe('inicio de sesión', () => {
@@ -29,13 +30,13 @@ describe('inicio de sesión', () => {
     })
 
     const { router } = renderRoute('/entrar?volver=/contribuir')
-    expect(await header().findByRole('link', { name: 'Entrar' })).toBeInTheDocument()
+    expect(await (await header()).findByRole('link', { name: 'Entrar' })).toBeInTheDocument()
 
-    await userEvent.type(screen.getByLabelText('Correo electrónico'), 'ana@example.org')
+    await userEvent.type(await screen.findByLabelText('Correo electrónico'), 'ana@example.org')
     await userEvent.type(screen.getByLabelText('Contraseña'), 'una frase de prueba segura')
     await userEvent.click(screen.getByRole('button', { name: 'Entrar' }))
 
-    expect(await header().findByText('Ana')).toBeInTheDocument()
+    expect(await (await header()).findByText('Ana')).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/contribuir')
     expect(sentToken).toBe('token-de-prueba')
     expect(sentBody).toEqual({ email: 'ana@example.org', password: 'una frase de prueba segura', rememberMe: false })
@@ -49,7 +50,7 @@ describe('inicio de sesión', () => {
     })
 
     renderRoute('/entrar')
-    await userEvent.type(screen.getByLabelText('Correo electrónico'), 'ana@example.org')
+    await userEvent.type(await screen.findByLabelText('Correo electrónico'), 'ana@example.org')
     await userEvent.type(screen.getByLabelText('Contraseña'), 'equivocada')
     await userEvent.click(screen.getByRole('button', { name: 'Entrar' }))
 
@@ -60,7 +61,7 @@ describe('inicio de sesión', () => {
     mockApi()
     renderRoute('/entrar')
 
-    const password = screen.getByLabelText('Contraseña')
+    const password = await screen.findByLabelText('Contraseña')
     expect(password).toHaveAttribute('type', 'password')
 
     await userEvent.click(screen.getByLabelText('Mostrar contraseña'))
@@ -84,8 +85,8 @@ describe('registro', () => {
     })
 
     renderRoute('/registro')
-    await userEvent.type(screen.getByLabelText('Nombre'), 'Ana')
-    await userEvent.type(screen.getByLabelText('Correo electrónico'), 'ana@example.org')
+    await userEvent.type(await screen.findByLabelText('Nombre'), 'Ana')
+    await userEvent.type(await screen.findByLabelText('Correo electrónico'), 'ana@example.org')
     await userEvent.type(screen.getByLabelText('Contraseña'), 'corta')
     await userEvent.click(screen.getByRole('button', { name: 'Crear cuenta' }))
 
@@ -99,12 +100,12 @@ describe('registro', () => {
     mockApi({ 'POST /api/auth/register': () => jsonResponse(ana, 201) })
 
     const { router } = renderRoute('/registro')
-    await userEvent.type(screen.getByLabelText('Nombre'), 'Ana')
-    await userEvent.type(screen.getByLabelText('Correo electrónico'), 'ana@example.org')
+    await userEvent.type(await screen.findByLabelText('Nombre'), 'Ana')
+    await userEvent.type(await screen.findByLabelText('Correo electrónico'), 'ana@example.org')
     await userEvent.type(screen.getByLabelText('Contraseña'), 'una frase de prueba segura')
     await userEvent.click(screen.getByRole('button', { name: 'Crear cuenta' }))
 
-    expect(await header().findByText('Ana')).toBeInTheDocument()
+    expect(await (await header()).findByText('Ana')).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/')
   })
 })
@@ -117,9 +118,9 @@ describe('cierre de sesión', () => {
     })
 
     renderRoute('/')
-    await userEvent.click(await header().findByRole('button', { name: 'Cerrar sesión' }))
+    await userEvent.click(await (await header()).findByRole('button', { name: 'Cerrar sesión' }))
 
-    expect(await header().findByRole('link', { name: 'Entrar' })).toBeInTheDocument()
+    expect(await (await header()).findByRole('link', { name: 'Entrar' })).toBeInTheDocument()
   })
 })
 

@@ -9,7 +9,7 @@ describe('página de estado', () => {
 
     renderRoute('/estado')
 
-    expect(screen.getByText('Comprobando el estado…')).toBeInTheDocument()
+    expect(await screen.findByText('Comprobando el estado…')).toBeInTheDocument()
     expect(await screen.findByText('Todo funciona correctamente')).toBeInTheDocument()
     expect(apiCalls(fetchMock)).toContain('GET /api/health')
   })

@@ -85,7 +85,7 @@ describe('catálogo', () => {
     const fetchMock = mockCatalog([csharp])
 
     const { router } = renderRoute('/cursos')
-    await userEvent.type(screen.getByRole('searchbox', { name: 'Buscar por nombre o descripción' }), 'lógica')
+    await userEvent.type(await screen.findByRole('searchbox', { name: 'Buscar por nombre o descripción' }), 'lógica')
     await userEvent.click(screen.getByRole('button', { name: 'Buscar' }))
 
     expect(router.state.location.search).toBe('?q=l%C3%B3gica')
