@@ -11,7 +11,7 @@ const areas = [
   {
     icon: BookOpenCheck,
     title: 'Fundamentos digitales y programación',
-    description: 'Uso del ordenador para desarrollar, lógica de programación desde cero, Git y GitHub.',
+    description: 'Uso del ordenador para desarrollar, programar desde cero con C# y .NET, Git y GitHub.',
     project: 'Un primer programa documentado y publicado en un repositorio propio.',
     status: 'Primera ruta · en preparación',
   },
@@ -61,6 +61,10 @@ const principles = [
   {
     title: 'Pensada para equipos modestos',
     text: 'Páginas ligeras que funcionan en el móvil y con conexiones lentas. Cada lección se puede seguir leyendo, sin necesidad de video.',
+  },
+  {
+    title: 'A tu ritmo o con acompañamiento',
+    text: 'Puedes estudiar por tu cuenta cuando quieras o unirte a una edición guiada con sesiones en vivo (en preparación).',
   },
   {
     title: 'Aprender haciendo',

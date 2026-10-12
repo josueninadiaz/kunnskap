@@ -147,6 +147,17 @@ kunnskap_academy/
 - **AttemptAnswer**: `AttemptId`, `QuestionId`, opciones elegidas o texto, `IsCorrect`, `PointsAwarded`.
 - Preparado para el futuro: **CodeExercise**, que se ejecutará en un *runner* aislado fuera del proceso de la API y se comunicará mediante una cola o HTTP. Nunca se ejecutará dentro del proceso de la API.
 
+### Cohorts (ediciones impartidas por un instructor)
+
+El curso se puede seguir a tu ritmo o dentro de una edición guiada. Las ediciones son opcionales: sin ellas, el curso funciona igual en modo autodidacta.
+
+- **Cohort** (edición): `CourseId`, `Slug`, `Title` (p. ej. «Edición enero 2027»), `StartsOn`, `EndsOn`, `EnrollmentOpensAt`, `EnrollmentClosesAt`, `Capacity?`, `Status` (Draft, Open, InProgress, Finished), `TimeZone` (zona IANA en la que se anuncian los horarios).
+- **CohortInstructor**: `CohortId`, `UserId`. Puede haber más de una persona instructora o mentora.
+- **CohortMembership**: `CohortId`, `UserId`, `JoinedAt`. Restricción única: (`CohortId`, `UserId`). Implica una `Enrollment` en el curso.
+- **LiveSession**: `CohortId`, `Title`, `StartsAt` (UTC), `DurationMinutes` (≤ 60 por el límite de Teams gratuito), `MeetingUrl` (Teams; visible solo para miembros de la edición), `RecordingUrl?`, `TranscriptMarkdown?`, `RelatedLessonIds`. Las sesiones grabadas deben tener subtítulos.
+- **CohortAnnouncement**: `CohortId`, `AuthorId`, `Title`, `BodyMarkdown`, `PublishedAt`.
+- Rol nuevo **Instructor** con permiso `cohorts:manage`. Solo puede gestionar las ediciones donde está asignado (autorización basada en recurso, comprobada en el servidor). Ve el progreso de su edición, pero **no** el correo de los alumnos salvo consentimiento.
+
 ### Transversales
 
 - **AuditLog**: actor, acción, entidad, id, fecha y datos sin información sensible. Registra las acciones de administración, como publicar o despublicar contenido o cambiar roles.
@@ -261,6 +272,8 @@ Las tablas de Identity (`users`, `roles`, `user_roles`, `user_claims`…) se gen
 - **D2 — Contenido en el repositorio frente a contenido solo en la base de datos.** La propuesta es mantener el contenido como archivos versionados en `content/` (ADR 0003).
 - **D3 — Nombre y dominio.** Nombre elegido: **Kunnskap**. Falta decidir el dominio. El nombre vive solo en la configuración (`Platform:Name`, `VITE_PLATFORM_NAME`).
 - **D4 — Idiomas.** Cada curso tiene un campo `language`, y las traducciones serán cursos distintos enlazados entre sí. Así se evitan tablas de traducción complejas.
+- **D6 — Modalidad de enseñanza. Decidida (2026-10-12):** ediciones en vivo impartidas por Josue Nina Diaz más lecciones escritas que permiten seguir el curso a tu ritmo. Sesiones en **Microsoft Teams** (versión gratuita: reuniones de hasta 60 minutos y 100 participantes, según fuentes no oficiales que hay que confirmar). Se graban con OBS y se publican en YouTube con subtítulos, porque la grabación del plan gratuito no está garantizada.
+- **D7 — Primer curso. Decidido (2026-10-12):** **«Programar desde cero con C#»**. Enseña lógica de programación directamente en C# con .NET 10 y aplicaciones de un solo archivo (`dotnet run hola.cs`, comprobado en local), sin `.csproj` ni ceremonia inicial. Sustituye a los cursos genéricos 1 y 2 de la Escuela 1 como puerta de entrada. Git y GitHub (curso 3) se mantienen.
 - **D5 — Proveedor de correo** para la confirmación de cuentas y la recuperación de contraseñas. En desarrollo los correos se escriben en el log, y la integración queda pendiente.
 
 ## 7. Plan de implementación priorizado
@@ -278,11 +291,22 @@ Las tablas de Identity (`users`, `roles`, `user_roles`, `user_claims`…) se gen
 
 ### Fase 2 — Primer recorrido educativo
 
-Registro e inicio de sesión → catálogo desde la base de datos con búsqueda y filtros → inscripción → lección → progreso → cuestionario → panel del estudiante → administración del contenido. Cada punto se entrega como un pull request pequeño, con sus pruebas.
+0. Preparación: .NET Aspire para orquestar el entorno local, Dev Container y GitHub Codespaces (aprender y contribuir sin instalar nada), y publicación del repositorio.
+1. Registro, inicio y cierre de sesión con cookie y antiforgery, limitación de solicitudes y roles (Student, Instructor, Editor y Admin).
+2. Catálogo desde la base de datos, con búsqueda y filtros.
+3. Inscripción gratuita.
+4. Lección con Markdown seguro.
+5. Progreso y punto de retorno.
+6. Cuestionario con intentos.
+7. Panel del estudiante.
+8. **Ediciones y sesiones en vivo:** crear una edición, unirse, ver el calendario en la zona horaria del alumno, enlace a Teams solo para miembros, grabación y transcripción.
+9. Administración del contenido.
+
+Cada punto se entrega como un pull request pequeño, con sus pruebas.
 
 ### Fase 3 — Primera ruta curricular
 
-La ruta «Programación desde cero»: cursos 1 a 3 de la Escuela 1, revisados y con un proyecto final y su rúbrica. Las demás escuelas aparecen como `InDevelopment` en el catálogo.
+La ruta «Programación desde cero»: el curso **«Programar desde cero con C#»**, impartido en una primera edición en vivo, más «Alfabetización digital» y «Git y GitHub», revisados y con un proyecto final y su rúbrica. Los ejercicios se pueden hacer en GitHub Codespaces desde el navegador. Las demás escuelas aparecen como `InDevelopment` en el catálogo.
 
 ### Fase 4 y Fase 5
 
