@@ -6,7 +6,7 @@
 
 Usa la función de [informe privado de vulnerabilidades de GitHub](https://docs.github.com/es/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability), en la pestaña *Security* del repositorio, opción *Report a vulnerability*.
 
-> Pendiente: esta función se activará cuando el repositorio sea público. Mientras tanto, el contacto de seguridad está por definir.
+Enlace directo: https://github.com/josueninadiaz/kunnskap/security/advisories/new
 
 Incluye en tu informe:
 
