@@ -24,12 +24,13 @@ objectives:
 prerequisites:
   - Ninguna experiencia en programación.
   - Saber usar un navegador y manejar archivos y carpetas. Si no, empieza por «Alfabetización digital para el desarrollo».
-  - Un ordenador con .NET 10 instalado, o una cuenta gratuita de GitHub para programar desde el navegador con Codespaces.
+  - Una computadora donde puedas instalar .NET 10, o una cuenta gratuita de GitHub para programar desde el navegador con Codespaces.
 authors: [Josue Nina Diaz]
 softwareVersions: [".NET 10"]
 modules:
   - title: Tu primer programa
     summary: Qué es programar, cómo preparar el entorno (en tu equipo o en Codespaces) y ejecutar tu primer `dotnet run hola.cs`.
+    lessons: modulo-01
   - title: Datos y operaciones
     summary: Variables, tipos de datos, operadores, y leer y escribir en la consola.
   - title: Tomar decisiones

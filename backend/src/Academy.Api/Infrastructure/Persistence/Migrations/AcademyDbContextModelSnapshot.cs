@@ -519,6 +519,80 @@ namespace Academy.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("Academy.Api.Modules.Learning.Enrollment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("course_id");
+
+                    b.Property<DateTimeOffset>("EnrolledAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("enrolled_at");
+
+                    b.Property<DateTimeOffset>("LastActivityAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_activity_at");
+
+                    b.Property<Guid?>("LastLessonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("last_lesson_id");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_enrollments");
+
+                    b.HasIndex("CourseId")
+                        .HasDatabaseName("ix_enrollments_course_id");
+
+                    b.HasIndex("LastLessonId")
+                        .HasDatabaseName("ix_enrollments_last_lesson_id");
+
+                    b.HasIndex("UserId", "CourseId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_enrollments_user_id_course_id");
+
+                    b.ToTable("enrollments", (string)null);
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Learning.LessonProgress", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<Guid>("LessonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("lesson_id");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at");
+
+                    b.Property<DateTimeOffset>("FirstViewedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("first_viewed_at");
+
+                    b.HasKey("UserId", "LessonId")
+                        .HasName("pk_lesson_progress");
+
+                    b.HasIndex("LessonId")
+                        .HasDatabaseName("ix_lesson_progress_lesson_id");
+
+                    b.ToTable("lesson_progress", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
                 {
                     b.Property<int>("Id")
@@ -725,6 +799,54 @@ namespace Academy.Api.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_lessons_course_modules_module_id");
 
                     b.Navigation("Module");
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Learning.Enrollment", b =>
+                {
+                    b.HasOne("Academy.Api.Modules.Catalog.Domain.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_enrollments_courses_course_id");
+
+                    b.HasOne("Academy.Api.Modules.Catalog.Domain.Lesson", "LastLesson")
+                        .WithMany()
+                        .HasForeignKey("LastLessonId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_enrollments_lessons_last_lesson_id");
+
+                    b.HasOne("Academy.Api.Modules.Identity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_enrollments_users_user_id");
+
+                    b.Navigation("Course");
+
+                    b.Navigation("LastLesson");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Learning.LessonProgress", b =>
+                {
+                    b.HasOne("Academy.Api.Modules.Catalog.Domain.Lesson", "Lesson")
+                        .WithMany()
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_lesson_progress_lessons_lesson_id");
+
+                    b.HasOne("Academy.Api.Modules.Identity.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_lesson_progress_users_user_id");
+
+                    b.Navigation("Lesson");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

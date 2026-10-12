@@ -151,7 +151,11 @@ export function CatalogPage() {
                   </Link>
                 </h2>
                 <p className="text-fg-muted">{course.summary}</p>
-                <CourseFacts level={course.level} estimatedMinutes={course.estimatedMinutes} />
+                <CourseFacts
+                  level={course.level}
+                  estimatedMinutes={course.estimatedMinutes}
+                  partial={course.status === 'Published' && !course.contentComplete}
+                />
                 {course.technologies.length > 0 ? (
                   <p className="text-sm">
                     <span className="sr-only">Tecnologías: </span>

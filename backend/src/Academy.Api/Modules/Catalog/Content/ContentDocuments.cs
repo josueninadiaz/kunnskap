@@ -63,4 +63,28 @@ internal sealed class ModuleDocument
     public string Title { get; set; } = string.Empty;
 
     public string Summary { get; set; } = string.Empty;
+
+    /// <summary>Carpeta (relativa al curso) con las lecciones del módulo en Markdown. Opcional.</summary>
+    public string? Lessons { get; set; }
 }
+
+/// <summary>Cabecera YAML de una lección (entre líneas <c>---</c> al principio del archivo .md).</summary>
+internal sealed class LessonFrontMatter
+{
+    public string Slug { get; set; } = string.Empty;
+
+    public string Title { get; set; } = string.Empty;
+
+    public int EstimatedMinutes { get; set; }
+
+    public string? VideoUrl { get; set; }
+}
+
+/// <summary>Lección ya leída: cabecera + las tres partes del cuerpo.</summary>
+internal sealed record LessonDocument(
+    string Path,
+    LessonFrontMatter Meta,
+    string Body,
+    string PracticeActivity,
+    string CheckCriteria,
+    string? Transcript);

@@ -18,7 +18,14 @@ export function CourseStatusBadge({ status }: { status: CourseStatus }) {
   )
 }
 
-export function CourseFacts({ level, estimatedMinutes }: { level: CourseLevel; estimatedMinutes: number | null }) {
+interface CourseFactsProps {
+  level: CourseLevel
+  estimatedMinutes: number | null
+  /** El curso está publicado pero aún tiene módulos sin lecciones: la duración es solo de lo publicado. */
+  partial?: boolean
+}
+
+export function CourseFacts({ level, estimatedMinutes, partial = false }: CourseFactsProps) {
   const duration = formatDuration(estimatedMinutes)
   return (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-fg-muted">
@@ -30,6 +37,7 @@ export function CourseFacts({ level, estimatedMinutes }: { level: CourseLevel; e
         <li className="inline-flex items-center gap-1.5">
           <Clock aria-hidden="true" className="size-4" />
           <span className="sr-only">Duración estimada:</span> {duration}
+          {partial ? ' de contenido publicado · más módulos en preparación' : null}
         </li>
       ) : null}
     </ul>

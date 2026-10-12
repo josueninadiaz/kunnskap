@@ -19,7 +19,10 @@ internal sealed class ContentOptions
     public bool ImportOnStartup { get; init; }
 }
 
-internal sealed record ImportResult(int Schools, int Technologies, int Courses);
+internal sealed record ImportResult(int Schools, int Technologies, int Courses, int Lessons);
+
+/// <summary>Curso leído de content/ con las lecciones de cada módulo (misma posición que <c>Doc.Modules</c>).</summary>
+internal sealed record CourseSource(string Path, CourseDocument Doc, List<List<LessonDocument>> ModuleLessons);
 
 /// <summary>Errores de contenido, todos a la vez, para corregirlos en una sola pasada.</summary>
 internal sealed class ContentValidationException(IReadOnlyList<string> errors)
@@ -49,13 +52,13 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
             ? Directory.GetFiles(System.IO.Path.Combine(contentPath, "cursos"), "curso.yml", SearchOption.AllDirectories)
             : [];
 
-        var courses = new List<(string Path, CourseDocument Doc)>();
+        var courses = new List<CourseSource>();
         foreach (var file in courseFiles.Order(StringComparer.Ordinal))
         {
             var relative = System.IO.Path.GetRelativePath(contentPath, file).Replace('\\', '/');
             if (Load<CourseDocument>(contentPath, relative, errors) is { } course)
             {
-                courses.Add((relative, course));
+                courses.Add(new CourseSource(relative, course, LoadLessons(contentPath, relative, course, errors)));
             }
         }
 
@@ -69,13 +72,22 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
 
         var schoolEntities = await UpsertSchoolsAsync(schools, cancellationToken);
         var technologyEntities = await UpsertTechnologiesAsync(technologies, cancellationToken);
-        await UpsertCoursesAsync(courses, schoolEntities, technologyEntities, cancellationToken);
+        var finalLessonOrder = await UpsertCoursesAsync(courses, schoolEntities, technologyEntities, cancellationToken);
+
+        // Dos pasos: las lecciones se guardan primero con posiciones provisionales (negativas) para que
+        // reordenar o mover lecciones entre módulos no choque con el índice único (módulo, posición).
+        await db.SaveChangesAsync(cancellationToken);
+        foreach (var (lesson, order) in finalLessonOrder)
+        {
+            lesson.SortOrder = order;
+        }
 
         await db.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
-        var result = new ImportResult(schools.Count, technologies.Count, courses.Count);
-        LogImported(logger, result.Schools, result.Technologies, result.Courses);
+        var lessonCount = courses.Sum(c => c.ModuleLessons.Sum(m => m.Count));
+        var result = new ImportResult(schools.Count, technologies.Count, courses.Count, lessonCount);
+        LogImported(logger, result.Schools, result.Technologies, result.Courses, result.Lessons);
         return result;
     }
 
@@ -106,15 +118,65 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
         }
     }
 
+    private static List<List<LessonDocument>> LoadLessons(string contentPath, string coursePath, CourseDocument course, List<string> errors)
+    {
+        var courseDir = System.IO.Path.GetDirectoryName(System.IO.Path.Combine(contentPath, coursePath))!;
+        var result = new List<List<LessonDocument>>();
+
+        foreach (var module in course.Modules)
+        {
+            var lessons = new List<LessonDocument>();
+            result.Add(lessons);
+            if (string.IsNullOrWhiteSpace(module.Lessons))
+            {
+                continue;
+            }
+
+            var dir = System.IO.Path.GetFullPath(System.IO.Path.Combine(courseDir, module.Lessons));
+            if (!dir.StartsWith(courseDir, StringComparison.Ordinal) || !Directory.Exists(dir))
+            {
+                errors.Add($"{coursePath}: la carpeta de lecciones «{module.Lessons}» no existe dentro del curso.");
+                continue;
+            }
+
+            // El orden de las lecciones es el de los nombres de archivo (01-…, 02-…).
+            foreach (var file in Directory.GetFiles(dir, "*.md").Order(StringComparer.Ordinal))
+            {
+                var relative = System.IO.Path.GetRelativePath(contentPath, file).Replace('\\', '/');
+                if (LessonParser.Parse(relative, File.ReadAllText(file), errors) is { } lesson)
+                {
+                    lessons.Add(lesson);
+                }
+            }
+
+            if (lessons.Count == 0)
+            {
+                errors.Add($"{coursePath}: la carpeta «{module.Lessons}» no contiene lecciones (.md).");
+            }
+        }
+
+        return result;
+    }
+
     private static void Validate(
         List<SchoolDocument> schools,
         List<TechnologyDocument> technologies,
-        List<(string Path, CourseDocument Doc)> courses,
+        List<CourseSource> courses,
         List<string> errors)
     {
         CheckUniqueSlugs("escuelas.yml", schools.Select(s => s.Slug), errors);
         CheckUniqueSlugs("tecnologias.yml", technologies.Select(t => t.Slug), errors);
         CheckUniqueSlugs("cursos", courses.Select(c => c.Doc.Slug), errors);
+
+        foreach (var course in courses)
+        {
+            var lessons = course.ModuleLessons.SelectMany(m => m).ToList();
+            CheckUniqueSlugs($"{course.Path} (lecciones)", lessons.Select(l => l.Meta.Slug), errors);
+            foreach (var lesson in lessons)
+            {
+                CheckSlug(lesson.Path, lesson.Meta.Slug, errors);
+            }
+        }
 
         foreach (var school in schools)
         {
@@ -132,7 +194,7 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
         var schoolSlugs = schools.Select(s => s.Slug).ToHashSet(StringComparer.Ordinal);
         var technologySlugs = technologies.Select(t => t.Slug).ToHashSet(StringComparer.Ordinal);
 
-        foreach (var (path, course) in courses)
+        foreach (var (path, course, moduleLessons) in courses)
         {
             CheckSlug(path, course.Slug, errors);
             CheckText(path, "title", course.Title, 200, errors);
@@ -170,18 +232,13 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
 
             if (status == ContentStatus.Published)
             {
-                ValidatePublishable(path, course, errors);
+                ValidatePublishable(path, course, moduleLessons, errors);
             }
         }
     }
 
-    private static void ValidatePublishable(string path, CourseDocument course, List<string> errors)
+    private static void ValidatePublishable(string path, CourseDocument course, List<List<LessonDocument>> moduleLessons, List<string> errors)
     {
-        if (course.EstimatedMinutes is null)
-        {
-            errors.Add($"{path}: un curso publicado necesita estimatedMinutes.");
-        }
-
         if (course.Objectives.Count == 0)
         {
             errors.Add($"{path}: un curso publicado necesita objetivos de aprendizaje.");
@@ -192,9 +249,12 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
             errors.Add($"{path}: un curso publicado necesita lastReviewedAt (fecha de la última revisión).");
         }
 
-        // Las lecciones se importarán desde Markdown en la fase 3. Hasta entonces, ningún curso del
-        // repositorio tiene lecciones y por tanto ninguno puede publicarse.
-        errors.Add($"{path}: un curso publicado necesita al menos un módulo con lecciones.");
+        // Se puede publicar con módulos aún en preparación (el temario lo indica), pero no sin lecciones.
+        // Si no se indica estimatedMinutes, la duración es la suma de las lecciones publicadas.
+        if (moduleLessons.All(m => m.Count == 0))
+        {
+            errors.Add($"{path}: un curso publicado necesita al menos un módulo con lecciones.");
+        }
     }
 
     private static void CheckUniqueSlugs(string where, IEnumerable<string> slugs, List<string> errors)
@@ -263,8 +323,8 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
         return existing;
     }
 
-    private async Task UpsertCoursesAsync(
-        List<(string Path, CourseDocument Doc)> documents,
+    private async Task<List<(Lesson Lesson, int Order)>> UpsertCoursesAsync(
+        List<CourseSource> documents,
         Dictionary<string, School> schools,
         Dictionary<string, Technology> technologies,
         CancellationToken ct)
@@ -272,11 +332,14 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
         var slugs = documents.Select(d => d.Doc.Slug).ToList();
         var existing = await db.Courses
             .Include(c => c.Technologies)
-            .Include(c => c.Modules)
+            .Include(c => c.Modules).ThenInclude(m => m.Lessons)
             .Where(c => slugs.Contains(c.Slug))
+            .AsSplitQuery()
             .ToDictionaryAsync(c => c.Slug, StringComparer.Ordinal, ct);
 
-        foreach (var (path, doc) in documents)
+        var finalLessonOrder = new List<(Lesson, int)>();
+
+        foreach (var (path, doc, moduleLessons) in documents)
         {
             if (!existing.TryGetValue(doc.Slug, out var course))
             {
@@ -292,7 +355,8 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
             course.DescriptionMarkdown = (doc.Description ?? doc.Summary).Trim();
             course.Level = Enum.Parse<CourseLevel>(doc.Level);
             course.Status = status;
-            course.EstimatedMinutes = doc.EstimatedMinutes;
+            course.EstimatedMinutes = doc.EstimatedMinutes
+                ?? (status == ContentStatus.Published ? moduleLessons.Sum(m => m.Sum(l => l.Meta.EstimatedMinutes)) : null);
             course.Language = doc.Language;
             course.LearningObjectives = [.. doc.Objectives.Select(o => o.Trim())];
             course.Prerequisites = [.. doc.Prerequisites.Select(p => p.Trim())];
@@ -309,29 +373,73 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
             course.Technologies.Clear();
             course.Technologies.AddRange(doc.Technologies.Select(t => technologies[t]));
 
-            SyncModules(course, doc.Modules);
+            SyncModules(course, doc.Modules, moduleLessons, finalLessonOrder);
         }
+
+        return finalLessonOrder;
     }
 
     /// <summary>
     /// Sincroniza los módulos por posición: actualiza los existentes, añade los nuevos y elimina los sobrantes.
     /// </summary>
-    private void SyncModules(Course course, List<ModuleDocument> documents)
+    private void SyncModules(
+        Course course,
+        List<ModuleDocument> documents,
+        List<List<LessonDocument>> moduleLessons,
+        List<(Lesson, int)> finalLessonOrder)
     {
         var current = course.Modules.OrderBy(m => m.SortOrder).ToList();
+        var existingLessons = current.SelectMany(m => m.Lessons).ToDictionary(l => l.Slug, StringComparer.Ordinal);
+        var keptLessons = new HashSet<string>(StringComparer.Ordinal);
+        var provisional = 0;
 
         for (var i = 0; i < documents.Count; i++)
         {
             var module = i < current.Count ? current[i] : null;
             if (module is null)
             {
+                // Add explícito: con el Id ya generado en el cliente (UUID v7), EF supondría que la
+                // entidad existe y haría un UPDATE en lugar de un INSERT.
                 module = new CourseModule { Title = documents[i].Title };
                 course.Modules.Add(module);
+                db.CourseModules.Add(module);
             }
 
             module.Title = documents[i].Title.Trim();
             module.Summary = documents[i].Summary.Trim();
             module.SortOrder = i + 1;
+
+            for (var j = 0; j < moduleLessons[i].Count; j++)
+            {
+                var doc = moduleLessons[i][j];
+                if (!existingLessons.TryGetValue(doc.Meta.Slug, out var lesson))
+                {
+                    lesson = new Lesson { Slug = doc.Meta.Slug, Title = doc.Meta.Title, BodyMarkdown = doc.Body };
+                    db.Lessons.Add(lesson);
+                }
+
+                if (lesson.Module != module)
+                {
+                    lesson.Module?.Lessons.Remove(lesson);
+                    module.Lessons.Add(lesson);
+                }
+
+                lesson.Title = doc.Meta.Title.Trim();
+                lesson.EstimatedMinutes = doc.Meta.EstimatedMinutes;
+                lesson.BodyMarkdown = doc.Body;
+                lesson.PracticeActivityMarkdown = doc.PracticeActivity;
+                lesson.CheckCriteriaMarkdown = doc.CheckCriteria;
+                lesson.VideoUrl = doc.Meta.VideoUrl is null ? null : new Uri(doc.Meta.VideoUrl);
+                lesson.TranscriptMarkdown = doc.Transcript;
+                lesson.SortOrder = --provisional;
+                finalLessonOrder.Add((lesson, j + 1));
+                keptLessons.Add(doc.Meta.Slug);
+            }
+        }
+
+        foreach (var removed in existingLessons.Values.Where(l => !keptLessons.Contains(l.Slug)))
+        {
+            db.Lessons.Remove(removed);
         }
 
         foreach (var extra in current.Skip(documents.Count))
@@ -343,6 +451,6 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
     [GeneratedRegex("^[a-z0-9]+(-[a-z0-9]+)*$")]
     private static partial Regex SlugPattern();
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Contenido importado: {Schools} escuelas, {Technologies} tecnologías, {Courses} cursos")]
-    private static partial void LogImported(ILogger logger, int schools, int technologies, int courses);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Contenido importado: {Schools} escuelas, {Technologies} tecnologías, {Courses} cursos, {Lessons} lecciones")]
+    private static partial void LogImported(ILogger logger, int schools, int technologies, int courses, int lessons);
 }

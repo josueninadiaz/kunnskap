@@ -5,6 +5,7 @@ using Academy.Api.Common.Security;
 using Academy.Api.Infrastructure.Persistence;
 using Academy.Api.Modules.Catalog;
 using Academy.Api.Modules.Identity;
+using Academy.Api.Modules.Learning;
 using Academy.Api.Modules.Platform;
 using Npgsql;
 
@@ -74,6 +75,7 @@ var api = app.MapGroup("/api").AddEndpointFilter<AntiforgeryFilter>();
 api.MapPlatformEndpoints();
 api.MapAuthEndpoints();
 api.MapCatalogEndpoints();
+api.MapLearningEndpoints();
 api.MapUserAdminEndpoints();
 
 await app.RunAsync();

@@ -1,0 +1,221 @@
+import { CheckCircle2, ChevronLeft, ChevronRight, Clock } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { Link, useLocation, useParams } from 'react-router'
+import { Button, ButtonLink } from '../../components/ui/Button'
+import { Markdown } from '../../components/ui/Markdown'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { StatusMessage } from '../../components/ui/StatusMessage'
+import { describeError } from '../../lib/api'
+import { useCurrentUser } from '../auth/authApi'
+import { type LessonView, useLesson } from '../catalog/catalogApi'
+import { useCourseProgress, useRecordVisit, useSetLessonCompletion } from './learningApi'
+
+export function LessonPage() {
+  const { slug = '', lessonSlug = '' } = useParams()
+  const lesson = useLesson(slug, lessonSlug)
+
+  if (lesson.isPending) return <StatusMessage tone="loading" title="Cargando la lección…" />
+
+  if (lesson.isError) {
+    return (
+      <StatusMessage
+        tone="error"
+        title="No se pudo cargar la lección"
+        action={
+          <Button variant="secondary" onClick={() => void lesson.refetch()}>
+            Reintentar
+          </Button>
+        }
+      >
+        {describeError(lesson.error)}
+      </StatusMessage>
+    )
+  }
+
+  if (lesson.data === null) {
+    return (
+      <section>
+        <PageHeader title="Lección no encontrada" description="Puede que la dirección sea incorrecta o que el curso aún no esté publicado." />
+        <ButtonLink to={`/cursos/${slug}`}>Volver al curso</ButtonLink>
+      </section>
+    )
+  }
+
+  // La key reinicia el estado (p. ej. el registro de visita) al pasar a otra lección.
+  return <LessonContent key={lesson.data.slug} lesson={lesson.data} />
+}
+
+function LessonContent({ lesson }: { lesson: LessonView }) {
+  const user = useCurrentUser()
+  const progress = useCourseProgress(lesson.courseSlug, Boolean(user.data))
+  const enrolled = progress.data?.enrolled === true
+  const recordVisit = useRecordVisit(lesson.courseSlug)
+  const visited = useRef(false)
+
+  // Guarda esta lección como punto desde el que continuar (una vez por lección).
+  useEffect(() => {
+    if (enrolled && !visited.current) {
+      visited.current = true
+      recordVisit.mutate(lesson.slug)
+    }
+  }, [enrolled, lesson.slug, recordVisit])
+
+  const lessonUrl = (slug: string) => `/cursos/${lesson.courseSlug}/lecciones/${slug}`
+
+  return (
+    <article className="mx-auto max-w-(--container-prose)">
+      <nav aria-label="Ruta de navegación" className="mb-4 text-sm text-fg-muted">
+        <ol className="flex flex-wrap gap-1">
+          <li>
+            <Link to="/cursos" className="underline hover:text-fg">
+              Cursos
+            </Link>
+            <span aria-hidden="true"> / </span>
+          </li>
+          <li>
+            <Link to={`/cursos/${lesson.courseSlug}`} className="underline hover:text-fg">
+              {lesson.courseTitle}
+            </Link>
+          </li>
+        </ol>
+      </nav>
+
+      <p className="mb-2 text-sm font-medium text-accent">
+        Módulo {lesson.moduleNumber}. {lesson.moduleTitle}
+      </p>
+      <PageHeader title={lesson.title} />
+      <p className="-mt-4 mb-8 flex flex-wrap gap-x-4 gap-y-1 text-sm text-fg-muted">
+        <span>
+          Lección {lesson.position} de {lesson.totalLessons}
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Clock aria-hidden="true" className="size-4" />
+          <span className="sr-only">Duración estimada:</span> {lesson.estimatedMinutes} min
+        </span>
+      </p>
+
+      <div className="space-y-10">
+        {lesson.videoUrl ? (
+          <section className="space-y-3 rounded-(--radius-panel) border border-border bg-surface p-4">
+            <p>
+              Esta lección tiene un{' '}
+              <a href={lesson.videoUrl} className="font-medium text-accent underline" target="_blank" rel="noopener noreferrer">
+                video opcional
+              </a>
+              . Todo su contenido está también en el texto.
+            </p>
+            {lesson.transcriptMarkdown ? (
+              <details>
+                <summary className="cursor-pointer font-medium">Transcripción del video</summary>
+                <div className="mt-3">
+                  <Markdown>{lesson.transcriptMarkdown}</Markdown>
+                </div>
+              </details>
+            ) : null}
+          </section>
+        ) : null}
+
+        <Markdown>{lesson.bodyMarkdown}</Markdown>
+
+        <section aria-labelledby="actividad" className="space-y-3 rounded-(--radius-panel) border border-border bg-surface p-5">
+          <h2 id="actividad" className="text-xl">
+            Actividad práctica
+          </h2>
+          <Markdown>{lesson.practiceActivityMarkdown}</Markdown>
+        </section>
+
+        <section aria-labelledby="comprueba" className="space-y-3">
+          <h2 id="comprueba" className="text-xl">
+            Comprueba lo aprendido
+          </h2>
+          <Markdown>{lesson.checkCriteriaMarkdown}</Markdown>
+        </section>
+
+        <CompletionControl lesson={lesson} enrolled={enrolled} signedIn={Boolean(user.data)} />
+
+        <nav aria-label="Lecciones" className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:justify-between">
+          {lesson.previous ? (
+            <Link to={lessonUrl(lesson.previous.slug)} className="group inline-flex items-start gap-2 text-sm">
+              <ChevronLeft aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+              <span>
+                <span className="block text-fg-muted">Anterior</span>
+                <span className="font-medium text-accent group-hover:underline">{lesson.previous.title}</span>
+              </span>
+            </Link>
+          ) : (
+            <span />
+          )}
+          {lesson.next ? (
+            <Link to={lessonUrl(lesson.next.slug)} className="group inline-flex items-start gap-2 text-sm sm:text-right">
+              <span>
+                <span className="block text-fg-muted">Siguiente</span>
+                <span className="font-medium text-accent group-hover:underline">{lesson.next.title}</span>
+              </span>
+              <ChevronRight aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+            </Link>
+          ) : (
+            <Link to={`/cursos/${lesson.courseSlug}`} className="text-sm font-medium text-accent underline">
+              Volver al temario del curso
+            </Link>
+          )}
+        </nav>
+      </div>
+    </article>
+  )
+}
+
+function CompletionControl({ lesson, enrolled, signedIn }: { lesson: LessonView; enrolled: boolean; signedIn: boolean }) {
+  const location = useLocation()
+  const progress = useCourseProgress(lesson.courseSlug, signedIn)
+  const setCompletion = useSetLessonCompletion(lesson.courseSlug)
+
+  if (!signedIn) {
+    return (
+      <p className="text-sm text-fg-muted">
+        <Link to={`/entrar?volver=${encodeURIComponent(location.pathname)}`} className="font-medium text-accent underline">
+          Entra
+        </Link>{' '}
+        o{' '}
+        <Link to="/registro" className="font-medium text-accent underline">
+          crea una cuenta gratuita
+        </Link>{' '}
+        para guardar tu progreso.
+      </p>
+    )
+  }
+
+  if (!enrolled) {
+    return (
+      <p className="text-sm text-fg-muted">
+        <Link to={`/cursos/${lesson.courseSlug}`} className="font-medium text-accent underline">
+          Inscríbete en el curso
+        </Link>{' '}
+        para marcar lecciones como completadas.
+      </p>
+    )
+  }
+
+  const done = progress.data?.completedLessonSlugs.includes(lesson.slug) ?? false
+
+  return (
+    <div className="space-y-3">
+      {setCompletion.isError ? (
+        <StatusMessage tone="error" title="No se pudo guardar">
+          {describeError(setCompletion.error)}
+        </StatusMessage>
+      ) : null}
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          variant={done ? 'secondary' : 'primary'}
+          aria-pressed={done}
+          disabled={setCompletion.isPending}
+          onClick={() => setCompletion.mutate({ lessonSlug: lesson.slug, completed: !done })}
+        >
+          {done ? <CheckCircle2 aria-hidden="true" className="size-4 text-success" /> : null}
+          {done ? 'Completada' : 'Marcar como completada'}
+        </Button>
+        {done ? <span className="text-sm text-fg-muted">Pulsa de nuevo si quieres desmarcarla.</span> : null}
+      </div>
+    </div>
+  )
+}

@@ -33,6 +33,8 @@ export interface CourseListItem {
   estimatedMinutes: number | null
   technologies: Technology[]
   moduleCount: number
+  /** Todos los módulos tienen lecciones publicadas. */
+  contentComplete: boolean
 }
 
 export interface Paged<T> {
@@ -60,6 +62,31 @@ export interface CourseDetail {
   lastReviewedAt: string | null
   technologies: Technology[]
   modules: { title: string; summary: string; lessons: { slug: string; title: string; estimatedMinutes: number }[] }[]
+  contentComplete: boolean
+}
+
+export interface LessonLink {
+  slug: string
+  title: string
+}
+
+export interface LessonView {
+  courseSlug: string
+  courseTitle: string
+  moduleNumber: number
+  moduleTitle: string
+  slug: string
+  title: string
+  estimatedMinutes: number
+  bodyMarkdown: string
+  practiceActivityMarkdown: string
+  checkCriteriaMarkdown: string
+  videoUrl: string | null
+  transcriptMarkdown: string | null
+  position: number
+  totalLessons: number
+  previous: LessonLink | null
+  next: LessonLink | null
 }
 
 /** Filtros del catálogo. Viven en la URL (?q=…&escuela=…) para poder compartir y volver atrás. */
@@ -120,6 +147,23 @@ export function useCourse(slug: string) {
     queryFn: async ({ signal }) => {
       try {
         return await apiGet<CourseDetail>(`/catalog/courses/${encodeURIComponent(slug)}`, { signal })
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 404) return null
+        throw error
+      }
+    },
+  })
+}
+
+export function useLesson(courseSlug: string, lessonSlug: string) {
+  return useQuery({
+    queryKey: ['catalog', 'lesson', courseSlug, lessonSlug],
+    queryFn: async ({ signal }) => {
+      try {
+        return await apiGet<LessonView>(
+          `/catalog/courses/${encodeURIComponent(courseSlug)}/lessons/${encodeURIComponent(lessonSlug)}`,
+          { signal },
+        )
       } catch (error) {
         if (error instanceof ApiError && error.status === 404) return null
         throw error

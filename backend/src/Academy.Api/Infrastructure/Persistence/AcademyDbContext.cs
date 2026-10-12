@@ -1,5 +1,6 @@
 using Academy.Api.Modules.Catalog.Domain;
 using Academy.Api.Modules.Identity;
+using Academy.Api.Modules.Learning;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -22,6 +23,10 @@ internal sealed class AcademyDbContext(DbContextOptions<AcademyDbContext> option
     public DbSet<CourseModule> CourseModules => Set<CourseModule>();
 
     public DbSet<Lesson> Lessons => Set<Lesson>();
+
+    public DbSet<Enrollment> Enrollments => Set<Enrollment>();
+
+    public DbSet<LessonProgress> LessonProgress => Set<LessonProgress>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

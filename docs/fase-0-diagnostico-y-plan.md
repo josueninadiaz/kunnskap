@@ -294,9 +294,9 @@ Las tablas de Identity (`users`, `roles`, `user_roles`, `user_claims`…) se gen
 0. ✅ Preparación: .NET Aspire para orquestar el entorno local, Dev Container y GitHub Codespaces (aprender y contribuir sin instalar nada), y publicación del repositorio.
 1. ✅ Registro, inicio y cierre de sesión con cookie y antiforgery, limitación de solicitudes y roles (Student, Instructor, Editor y Admin). *(2026-10-12)*
 2. ✅ Catálogo desde la base de datos, con búsqueda sin tildes, filtros, paginación y contenido importado desde `content/`. *(2026-10-12)*
-3. Inscripción gratuita.
-4. Lección con Markdown seguro.
-5. Progreso y punto de retorno.
+3. ✅ Inscripción gratuita. *(2026-10-12)*
+4. ✅ Lección con Markdown seguro, pública y sin necesidad de cuenta, con navegación entre lecciones. *(2026-10-12)*
+5. ✅ Progreso, lecciones completadas y punto desde el que continuar. *(2026-10-12)*
 6. Cuestionario con intentos.
 7. Panel del estudiante.
 8. **Ediciones y sesiones en vivo:** crear una edición, unirse, ver el calendario en la zona horaria del alumno, enlace a Teams solo para miembros, grabación y transcripción.

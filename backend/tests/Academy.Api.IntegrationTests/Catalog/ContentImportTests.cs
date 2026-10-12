@@ -71,6 +71,118 @@ public sealed class ContentImportTests(PostgresFixture postgres) : IDisposable
         Assert.Equal("content/cursos/fundamentos/programar-desde-cero-con-csharp/curso.yml", csharp.SourcePath);
         Assert.Contains("Josue Nina Diaz", csharp.Authors);
         Assert.Equal(csharp.Modules.Count, csharp.Modules.Select(m => m.SortOrder).Distinct().Count());
+
+        var firstModuleLessons = await db.Lessons
+            .Where(l => l.Module!.CourseId == csharp.Id && l.Module.SortOrder == 1)
+            .OrderBy(l => l.SortOrder)
+            .Select(l => l.Slug)
+            .ToListAsync(Ct);
+        Assert.Equal(["que-es-programar", "prepara-tu-entorno", "tu-primer-programa", "cuando-algo-falla"], firstModuleLessons);
+    }
+
+    private static string LessonFile(string slug, int minutes = 10) => $"""
+        ---
+        slug: {slug}
+        title: Lección {slug}
+        estimatedMinutes: {minutes}
+        ---
+        Cuerpo de {slug}
+
+        ## Actividad práctica
+        Practica
+
+        ## Comprueba lo aprendido
+        Comprueba
+        """;
+
+    private static void WriteFile(string dir, string relativePath, string text)
+    {
+        var file = Path.Combine(dir, relativePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(file)!);
+        File.WriteAllText(file, text);
+    }
+
+    private static string CourseYaml(string school, string slug, string status, string modules) => $"""
+        slug: {slug}
+        school: {school}
+        order: 1
+        title: Curso
+        summary: Resumen
+        level: Beginner
+        status: {status}
+        objectives: [Escribir un programa]
+        lastReviewedAt: 2026-10-01
+        modules:
+        {modules}
+        """;
+
+    [Fact]
+    public async Task Lessons_can_be_added_reordered_moved_and_removed_on_an_existing_course()
+    {
+        var school = $"escuela-{Guid.NewGuid():N}";
+        var slug = $"curso-{Guid.NewGuid():N}";
+        var dir = TempContent($"- {{ slug: {school}, order: 1, name: Escuela, description: Descripción }}", "[]");
+
+        // Versión 1: un módulo con las lecciones a y b.
+        WriteFile(dir, $"cursos/{school}/curso/curso.yml", CourseYaml(school, slug, "InDevelopment", "  - { title: Uno, summary: '', lessons: m1 }"));
+        WriteFile(dir, $"cursos/{school}/curso/m1/01-a.md", LessonFile("a"));
+        WriteFile(dir, $"cursos/{school}/curso/m1/02-b.md", LessonFile("b"));
+        await ImportAsync(dir);
+
+        // Versión 2: b desaparece, c es nueva y va primero, y a se mueve a un módulo nuevo.
+        File.Delete(Path.Combine(dir, $"cursos/{school}/curso/m1/01-a.md"));
+        File.Delete(Path.Combine(dir, $"cursos/{school}/curso/m1/02-b.md"));
+        WriteFile(dir, $"cursos/{school}/curso/curso.yml", CourseYaml(school, slug, "InDevelopment",
+            "  - { title: Uno, summary: '', lessons: m1 }\n  - { title: Dos, summary: '', lessons: m2 }"));
+        WriteFile(dir, $"cursos/{school}/curso/m1/01-c.md", LessonFile("c"));
+        WriteFile(dir, $"cursos/{school}/curso/m2/01-a.md", LessonFile("a"));
+        await ImportAsync(dir);
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AcademyDbContext>();
+        var lessons = await db.Lessons
+            .Where(l => l.Module!.Course!.Slug == slug)
+            .OrderBy(l => l.Module!.SortOrder).ThenBy(l => l.SortOrder)
+            .Select(l => new { Module = l.Module!.SortOrder, l.Slug, l.SortOrder })
+            .ToListAsync(Ct);
+
+        Assert.Equal([(1, "c", 1), (2, "a", 1)], lessons.Select(l => (l.Module, l.Slug, l.SortOrder)));
+    }
+
+    [Fact]
+    public async Task Published_courses_without_explicit_duration_use_the_sum_of_their_lessons()
+    {
+        var school = $"escuela-{Guid.NewGuid():N}";
+        var slug = $"curso-{Guid.NewGuid():N}";
+        var dir = TempContent($"- {{ slug: {school}, order: 1, name: Escuela, description: Descripción }}", "[]");
+        WriteFile(dir, $"cursos/{school}/curso/curso.yml", CourseYaml(school, slug, "Published",
+            "  - { title: Uno, summary: '', lessons: m1 }\n  - { title: Dos (en preparación), summary: '' }"));
+        WriteFile(dir, $"cursos/{school}/curso/m1/01-a.md", LessonFile("a", 15));
+        WriteFile(dir, $"cursos/{school}/curso/m1/02-b.md", LessonFile("b", 20));
+
+        await ImportAsync(dir);
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<AcademyDbContext>();
+        var course = await db.Courses.SingleAsync(c => c.Slug == slug, Ct);
+        Assert.Equal(ContentStatus.Published, course.Status);
+        Assert.Equal(35, course.EstimatedMinutes);
+        Assert.NotNull(course.PublishedAt);
+    }
+
+    [Fact]
+    public async Task Duplicate_lesson_slugs_within_a_course_are_rejected()
+    {
+        var school = $"escuela-{Guid.NewGuid():N}";
+        var dir = TempContent($"- {{ slug: {school}, order: 1, name: Escuela, description: Descripción }}", "[]");
+        WriteFile(dir, $"cursos/{school}/curso/curso.yml", CourseYaml(school, $"curso-{Guid.NewGuid():N}", "InDevelopment",
+            "  - { title: Uno, summary: '', lessons: m1 }\n  - { title: Dos, summary: '', lessons: m2 }"));
+        WriteFile(dir, $"cursos/{school}/curso/m1/01-a.md", LessonFile("repetida"));
+        WriteFile(dir, $"cursos/{school}/curso/m2/01-a.md", LessonFile("repetida"));
+
+        var ex = await Assert.ThrowsAsync<ContentValidationException>(() => ImportAsync(dir));
+
+        Assert.Contains(ex.Errors, e => e.Contains("«repetida» está repetido", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -100,7 +212,7 @@ public sealed class ContentImportTests(PostgresFixture postgres) : IDisposable
     }
 
     [Fact]
-    public async Task Courses_cannot_be_published_without_duration_objectives_review_and_lessons()
+    public async Task Courses_cannot_be_published_without_objectives_review_and_lessons()
     {
         var school = $"escuela-{Guid.NewGuid():N}";
         var dir = TempContent(
@@ -118,7 +230,6 @@ public sealed class ContentImportTests(PostgresFixture postgres) : IDisposable
 
         var ex = await Assert.ThrowsAsync<ContentValidationException>(() => ImportAsync(dir));
 
-        Assert.Contains(ex.Errors, e => e.Contains("estimatedMinutes", StringComparison.Ordinal));
         Assert.Contains(ex.Errors, e => e.Contains("objetivos", StringComparison.Ordinal));
         Assert.Contains(ex.Errors, e => e.Contains("lastReviewedAt", StringComparison.Ordinal));
         Assert.Contains(ex.Errors, e => e.Contains("lecciones", StringComparison.Ordinal));

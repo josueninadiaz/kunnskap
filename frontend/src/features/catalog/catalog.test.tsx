@@ -15,6 +15,7 @@ const csharp: CourseListItem = {
   estimatedMinutes: null,
   technologies: [{ slug: 'csharp', name: 'C#' }],
   moduleCount: 8,
+  contentComplete: false,
 }
 
 const published: CourseListItem = {
@@ -24,6 +25,7 @@ const published: CourseListItem = {
   status: 'Published',
   estimatedMinutes: 720,
   technologies: [],
+  contentComplete: true,
 }
 
 const page = (items: CourseListItem[]) => jsonResponse({ items, page: 1, pageSize: 20, totalCount: items.length })
@@ -126,6 +128,7 @@ const detail: CourseDetail = {
   lastReviewedAt: null,
   technologies: [{ slug: 'csharp', name: 'C#' }],
   modules: [{ title: 'Tu primer programa', summary: 'Ejecutar `dotnet run hola.cs`.', lessons: [] }],
+  contentComplete: false,
 }
 
 describe('detalle de curso', () => {

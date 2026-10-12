@@ -43,6 +43,13 @@ Cada módulo contiene su dominio (`Domain/`), su configuración de EF (`Persiste
 - La búsqueda usa `ILIKE` con `unaccent()`, de modo que «logica» encuentra «Lógica», y escapa los comodines. Con un catálogo de decenas de cursos no necesita índices. Si crece a miles, habrá que añadir un índice trigram (`pg_trgm`).
 - En Azure Database for PostgreSQL hay que permitir la extensión `unaccent` (parámetro `azure.extensions`).
 
+## Aprendizaje
+
+- Las lecciones de cursos **publicados** son públicas (`/api/catalog/courses/{curso}/lessons/{lección}`): se pueden leer sin cuenta.
+- `Modules/Learning`: `Enrollment` (única por persona y curso) y `LessonProgress` (primera visita y fecha de completado). Los endpoints `/api/learning/courses/{curso}/…` exigen sesión, y guardar progreso exige inscripción.
+- Un curso se da por completado cuando lo están todas sus lecciones publicadas. Si se publican lecciones nuevas, vuelve a quedar abierto. Las evaluaciones se sumarán a esta regla.
+- Las entidades nuevas con `Guid` generado en el cliente se registran con `Add` explícito: si solo se añaden a una colección de una entidad ya existente, EF Core supone que existen y hace un `UPDATE` (ver `ContentImporter`).
+
 ## Seguridad (resumen)
 
 - La autenticación usa ASP.NET Core Identity con la cookie `kunnskap_session` (HttpOnly, `SameSite=Strict` y `Secure` fuera de desarrollo). Los endpoints están en `/api/auth/*`.

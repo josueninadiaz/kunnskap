@@ -25,7 +25,8 @@ internal sealed record CourseListItem(
     ContentStatus Status,
     int? EstimatedMinutes,
     IReadOnlyList<TechnologySummary> Technologies,
-    int ModuleCount);
+    int ModuleCount,
+    bool ContentComplete);
 
 internal sealed record PagedResponse<T>(IReadOnlyList<T> Items, int Page, int PageSize, int TotalCount);
 
@@ -50,7 +51,28 @@ internal sealed record CourseDetail(
     IReadOnlyList<string> SoftwareVersions,
     DateTimeOffset? LastReviewedAt,
     IReadOnlyList<TechnologySummary> Technologies,
-    IReadOnlyList<ModuleOutline> Modules);
+    IReadOnlyList<ModuleOutline> Modules,
+    bool ContentComplete);
+
+internal sealed record LessonLink(string Slug, string Title);
+
+internal sealed record LessonView(
+    string CourseSlug,
+    string CourseTitle,
+    int ModuleNumber,
+    string ModuleTitle,
+    string Slug,
+    string Title,
+    int EstimatedMinutes,
+    string BodyMarkdown,
+    string PracticeActivityMarkdown,
+    string CheckCriteriaMarkdown,
+    Uri? VideoUrl,
+    string? TranscriptMarkdown,
+    int Position,
+    int TotalLessons,
+    LessonLink? Previous,
+    LessonLink? Next);
 
 /// <summary>
 /// Catálogo público. Solo muestra cursos publicados o en preparación; los borradores y archivados
@@ -75,6 +97,9 @@ internal static class CatalogEndpoints
 
         group.MapGet("/courses/{slug}", GetCourseAsync)
             .WithSummary("Detalle de un curso: objetivos, requisitos y temario.");
+
+        group.MapGet("/courses/{slug}/lessons/{lessonSlug}", GetLessonAsync)
+            .WithSummary("Contenido de una lección de un curso publicado, con enlaces a la anterior y la siguiente. Es público: no requiere cuenta.");
 
         return api;
     }
@@ -192,7 +217,8 @@ internal static class CatalogEndpoints
                 c.Status,
                 c.EstimatedMinutes,
                 c.Technologies.OrderBy(t => t.Name).Select(t => new TechnologySummary(t.Slug, t.Name)).ToList(),
-                c.Modules.Count))
+                c.Modules.Count,
+                c.Modules.Count > 0 && c.Modules.All(m => m.Lessons.Count > 0)))
             .ToListAsync(ct);
 
         return TypedResults.Ok(new PagedResponse<CourseListItem>(items, page, pageSize, total));
@@ -226,10 +252,61 @@ internal static class CatalogEndpoints
                         m.Title,
                         m.Summary,
                         m.Lessons.OrderBy(l => l.SortOrder).Select(l => new LessonOutline(l.Slug, l.Title, l.EstimatedMinutes)).ToList()))
-                    .ToList()))
+                    .ToList(),
+                c.Modules.Count > 0 && c.Modules.All(m => m.Lessons.Count > 0)))
             .SingleOrDefaultAsync(ct);
 
         return course is null ? TypedResults.NotFound() : TypedResults.Ok(course);
+    }
+
+    private static async Task<Results<Ok<LessonView>, NotFound>> GetLessonAsync(
+        string slug,
+        string lessonSlug,
+        AcademyDbContext db,
+        CancellationToken ct)
+    {
+        // Las lecciones solo son visibles en cursos publicados.
+        var outline = await db.Lessons
+            .AsNoTracking()
+            .Where(l => l.Module!.Course!.Slug == slug && l.Module.Course.Status == ContentStatus.Published)
+            .OrderBy(l => l.Module!.SortOrder)
+            .ThenBy(l => l.SortOrder)
+            .Select(l => new { l.Id, l.Slug, l.Title })
+            .ToListAsync(ct);
+
+        var index = outline.FindIndex(l => l.Slug == lessonSlug);
+        if (index < 0)
+        {
+            return TypedResults.NotFound();
+        }
+
+        var id = outline[index].Id;
+        var previous = index > 0 ? new LessonLink(outline[index - 1].Slug, outline[index - 1].Title) : null;
+        var next = index < outline.Count - 1 ? new LessonLink(outline[index + 1].Slug, outline[index + 1].Title) : null;
+
+        var lesson = await db.Lessons
+            .AsNoTracking()
+            .Where(l => l.Id == id)
+            .Select(l => new LessonView(
+                l.Module!.Course!.Slug,
+                l.Module.Course.Title,
+                l.Module.SortOrder,
+                l.Module.Title,
+                l.Slug,
+                l.Title,
+                l.EstimatedMinutes,
+                l.BodyMarkdown,
+                l.PracticeActivityMarkdown,
+                l.CheckCriteriaMarkdown,
+                l.VideoUrl,
+                l.TranscriptMarkdown,
+                index + 1,
+                outline.Count,
+                previous,
+                next))
+            .SingleAsync(ct);
+
+        return TypedResults.Ok(lesson);
     }
 
     private static TEnum? ParseEnum<TEnum>(string? value, string field, Dictionary<string, string[]> errors)

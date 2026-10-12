@@ -4,6 +4,7 @@ import { RegisterPage } from '../features/auth/RegisterPage'
 import { CatalogPage } from '../features/catalog/CatalogPage'
 import { CourseDetailPage } from '../features/catalog/CourseDetailPage'
 import { ContributePage } from '../features/contribute/ContributePage'
+import { LessonPage } from '../features/learning/LessonPage'
 import { HomePage } from '../features/home/HomePage'
 import { PrivacyPage } from '../features/legal/PrivacyPage'
 import { StatusPage } from '../features/status/StatusPage'
@@ -20,6 +21,7 @@ export const routes: RouteObject[] = [
           { index: true, element: <HomePage /> },
           { path: 'cursos', element: <CatalogPage /> },
           { path: 'cursos/:slug', element: <CourseDetailPage /> },
+          { path: 'cursos/:slug/lecciones/:lessonSlug', element: <LessonPage /> },
           { path: 'contribuir', element: <ContributePage /> },
           { path: 'estado', element: <StatusPage /> },
           { path: 'entrar', element: <LoginPage /> },

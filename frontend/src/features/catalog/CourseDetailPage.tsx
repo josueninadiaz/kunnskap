@@ -3,7 +3,11 @@ import { Button, ButtonLink } from '../../components/ui/Button'
 import { Markdown } from '../../components/ui/Markdown'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { StatusMessage } from '../../components/ui/StatusMessage'
+import { CheckCircle2 } from 'lucide-react'
 import { describeError } from '../../lib/api'
+import { useCurrentUser } from '../auth/authApi'
+import { EnrollmentPanel } from '../learning/EnrollmentPanel'
+import { useCourseProgress } from '../learning/learningApi'
 import { type CourseDetail, useCourse } from './catalogApi'
 import { CourseFacts, CourseStatusBadge } from './CourseMeta'
 
@@ -53,6 +57,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function CourseView({ course }: { course: CourseDetail }) {
+  const user = useCurrentUser()
+  const published = course.status === 'Published'
+  const progress = useCourseProgress(course.slug, published && Boolean(user.data))
+  const completed = new Set(progress.data?.completedLessonSlugs ?? [])
+  const lessonSlugs = course.modules.flatMap((m) => m.lessons.map((l) => l.slug))
+
   return (
     <article className="max-w-3xl">
       <nav aria-label="Ruta de navegación" className="mb-4 text-sm text-fg-muted">
@@ -77,7 +87,9 @@ function CourseView({ course }: { course: CourseDetail }) {
       <PageHeader title={course.title} description={course.summary} />
 
       <div className="space-y-10">
-        <CourseFacts level={course.level} estimatedMinutes={course.estimatedMinutes} />
+        <CourseFacts level={course.level} estimatedMinutes={course.estimatedMinutes} partial={published && !course.contentComplete} />
+
+        {published ? <EnrollmentPanel courseSlug={course.slug} lessonSlugs={lessonSlugs} /> : null}
 
         {course.status === 'InDevelopment' ? (
           <StatusMessage tone="info" title="Este curso está en preparación">
@@ -117,6 +129,9 @@ function CourseView({ course }: { course: CourseDetail }) {
                   <h3 className="font-semibold">
                     Módulo {index + 1}. {m.title}
                   </h3>
+                  {published && m.lessons.length === 0 ? (
+                    <p className="text-sm text-fg-muted">En preparación</p>
+                  ) : null}
                   {m.summary ? (
                     <div className="mt-1 text-fg-muted">
                       <Markdown>{m.summary}</Markdown>
@@ -126,7 +141,16 @@ function CourseView({ course }: { course: CourseDetail }) {
                     <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm">
                       {m.lessons.map((l) => (
                         <li key={l.slug}>
-                          {l.title} <span className="text-fg-muted">({l.estimatedMinutes} min)</span>
+                          <Link to={`/cursos/${course.slug}/lecciones/${l.slug}`} className="text-accent underline">
+                            {l.title}
+                          </Link>{' '}
+                          <span className="text-fg-muted">({l.estimatedMinutes} min)</span>
+                          {completed.has(l.slug) ? (
+                            <span className="ml-2 inline-flex items-center gap-1 text-success">
+                              <CheckCircle2 aria-hidden="true" className="size-4" />
+                              <span className="sr-only">Completada</span>
+                            </span>
+                          ) : null}
                         </li>
                       ))}
                     </ol>
