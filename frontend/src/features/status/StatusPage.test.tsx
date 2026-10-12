@@ -1,21 +1,21 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
-import { jsonResponse, renderRoute } from '../../test/render'
+import { describe, expect, it } from 'vitest'
+import { apiCalls, jsonResponse, mockApi, renderRoute } from '../../test/render'
 
 describe('página de estado', () => {
   it('muestra el estado de carga y después el éxito', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(jsonResponse({ status: 'ok', database: true }))
+    const fetchMock = mockApi({ 'GET /api/health': () => jsonResponse({ status: 'ok', database: true }) })
 
     renderRoute('/estado')
 
-    expect(screen.getByRole('status')).toHaveTextContent('Comprobando el estado')
+    expect(screen.getByText('Comprobando el estado…')).toBeInTheDocument()
     expect(await screen.findByText('Todo funciona correctamente')).toBeInTheDocument()
-    expect(globalThis.fetch).toHaveBeenCalledWith('/api/health', expect.objectContaining({ method: 'GET' }))
+    expect(apiCalls(fetchMock)).toContain('GET /api/health')
   })
 
   it('distingue una base de datos caída (503) de un error de red', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(jsonResponse({ status: 'degraded', database: false }, 503))
+    mockApi({ 'GET /api/health': () => jsonResponse({ status: 'degraded', database: false }, 503) })
 
     renderRoute('/estado')
 
@@ -23,10 +23,14 @@ describe('página de estado', () => {
   })
 
   it('muestra un error comprensible sin conexión y permite reintentar', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
-      .mockResolvedValueOnce(jsonResponse({ status: 'ok', database: true }))
+    let attempts = 0
+    mockApi({
+      'GET /api/health': () => {
+        attempts += 1
+        if (attempts === 1) throw new TypeError('Failed to fetch')
+        return jsonResponse({ status: 'ok', database: true })
+      },
+    })
 
     renderRoute('/estado')
 
@@ -36,6 +40,6 @@ describe('página de estado', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }))
 
     expect(await screen.findByText('Todo funciona correctamente')).toBeInTheDocument()
-    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(attempts).toBe(2)
   })
 })

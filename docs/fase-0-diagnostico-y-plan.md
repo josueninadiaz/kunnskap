@@ -291,8 +291,8 @@ Las tablas de Identity (`users`, `roles`, `user_roles`, `user_claims`…) se gen
 
 ### Fase 2 — Primer recorrido educativo
 
-0. Preparación: .NET Aspire para orquestar el entorno local, Dev Container y GitHub Codespaces (aprender y contribuir sin instalar nada), y publicación del repositorio.
-1. Registro, inicio y cierre de sesión con cookie y antiforgery, limitación de solicitudes y roles (Student, Instructor, Editor y Admin).
+0. ✅ Preparación: .NET Aspire para orquestar el entorno local, Dev Container y GitHub Codespaces (aprender y contribuir sin instalar nada), y publicación del repositorio.
+1. ✅ Registro, inicio y cierre de sesión con cookie y antiforgery, limitación de solicitudes y roles (Student, Instructor, Editor y Admin). *(2026-10-12)*
 2. Catálogo desde la base de datos, con búsqueda y filtros.
 3. Inscripción gratuita.
 4. Lección con Markdown seguro.

@@ -1,4 +1,5 @@
-import { NavLink, Outlet, ScrollRestoration } from 'react-router'
+import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router'
+import { AccountMenu } from '../features/auth/AccountMenu'
 import { config } from '../lib/config'
 import { CODE_LICENSE, CONTENT_LICENSE, ORIGINAL_ATTRIBUTION, sourceUrl } from '../lib/legal'
 
@@ -41,6 +42,7 @@ export function RootLayout() {
               ))}
             </ul>
           </nav>
+          <AccountMenu />
         </div>
       </header>
 
@@ -55,6 +57,11 @@ export function RootLayout() {
             acreditada: sus cursos y constancias no equivalen a títulos universitarios ni garantizan un empleo.
           </p>
           <p>{ORIGINAL_ATTRIBUTION}</p>
+          <p>
+            <Link className="underline hover:text-fg" to="/privacidad">
+              Privacidad
+            </Link>
+          </p>
           <p>
             Código bajo licencia{' '}
             <a className="underline hover:text-fg" href={CODE_LICENSE.url} rel="license">

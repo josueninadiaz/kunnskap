@@ -1,6 +1,9 @@
 import type { RouteObject } from 'react-router'
+import { LoginPage } from '../features/auth/LoginPage'
+import { RegisterPage } from '../features/auth/RegisterPage'
 import { ContributePage } from '../features/contribute/ContributePage'
 import { HomePage } from '../features/home/HomePage'
+import { PrivacyPage } from '../features/legal/PrivacyPage'
 import { StatusPage } from '../features/status/StatusPage'
 import { RootLayout } from './RootLayout'
 import { NotFoundPage, RouteError } from './RouteError'
@@ -15,6 +18,9 @@ export const routes: RouteObject[] = [
           { index: true, element: <HomePage /> },
           { path: 'contribuir', element: <ContributePage /> },
           { path: 'estado', element: <StatusPage /> },
+          { path: 'entrar', element: <LoginPage /> },
+          { path: 'registro', element: <RegisterPage /> },
+          { path: 'privacidad', element: <PrivacyPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

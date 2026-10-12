@@ -38,8 +38,10 @@ Cada módulo contiene su dominio (`Domain/`), su configuración de EF (`Persiste
 
 ## Seguridad (resumen)
 
-- La autenticación usará ASP.NET Core Identity con una cookie HttpOnly y `SameSite=Strict`, más antiforgery en las peticiones que modifican datos (fase 2).
-- La autorización se basa en **permisos** (`content:manage`, `content:publish`, `users:manage`) comprobados en el servidor.
+- La autenticación usa ASP.NET Core Identity con la cookie `kunnskap_session` (HttpOnly, `SameSite=Strict` y `Secure` fuera de desarrollo). Los endpoints están en `/api/auth/*`.
+- Todo POST, PUT, PATCH o DELETE bajo `/api` exige el token antiforgery (`AntiforgeryFilter`). El frontend lo gestiona en `lib/api.ts` (`apiSend`).
+- La autorización se basa en **permisos** (`content:manage`, `content:publish`, `cohorts:manage`, `users:manage`) que se añaden como claims al iniciar sesión (`PermissionClaimsFactory`) y se comprueban en el servidor. Los roles se siembran mediante una migración.
+- Los DTO de petición son `public`: el generador de validación de .NET 10 ignora los tipos `internal`.
 - Cabeceras de seguridad en todas las respuestas, y CORS cerrado por defecto.
 - Ver [seguridad/modelo-de-amenazas.md](seguridad/modelo-de-amenazas.md).
 

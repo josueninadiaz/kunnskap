@@ -374,6 +374,36 @@ namespace Academy.Api.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("019a1c00-0000-7000-8000-000000000001"),
+                            ConcurrencyStamp = "019a1c00-0000-7000-8000-000000000001",
+                            Name = "Student",
+                            NormalizedName = "STUDENT"
+                        },
+                        new
+                        {
+                            Id = new Guid("019a1c00-0000-7000-8000-000000000002"),
+                            ConcurrencyStamp = "019a1c00-0000-7000-8000-000000000002",
+                            Name = "Instructor",
+                            NormalizedName = "INSTRUCTOR"
+                        },
+                        new
+                        {
+                            Id = new Guid("019a1c00-0000-7000-8000-000000000003"),
+                            ConcurrencyStamp = "019a1c00-0000-7000-8000-000000000003",
+                            Name = "Editor",
+                            NormalizedName = "EDITOR"
+                        },
+                        new
+                        {
+                            Id = new Guid("019a1c00-0000-7000-8000-000000000004"),
+                            ConcurrencyStamp = "019a1c00-0000-7000-8000-000000000004",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        });
                 });
 
             modelBuilder.Entity("Academy.Api.Modules.Identity.User", b =>
@@ -475,6 +505,29 @@ namespace Academy.Api.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FriendlyName")
+                        .HasColumnType("text")
+                        .HasColumnName("friendly_name");
+
+                    b.Property<string>("Xml")
+                        .HasColumnType("text")
+                        .HasColumnName("xml");
+
+                    b.HasKey("Id")
+                        .HasName("pk_data_protection_keys");
+
+                    b.ToTable("data_protection_keys", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

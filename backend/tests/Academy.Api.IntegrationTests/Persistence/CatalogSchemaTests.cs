@@ -15,7 +15,7 @@ public sealed class CatalogSchemaTests(PostgresFixture postgres) : IDisposable
 
     private AsyncServiceScope CreateScope(out AcademyDbContext db)
     {
-        // Forzar el arranque del host para que se apliquen las migraciones.
+        // Forzar el arranque del host (las migraciones ya las aplicó PostgresFixture).
         _ = _factory.Server;
         var scope = _factory.Services.CreateAsyncScope();
         db = scope.ServiceProvider.GetRequiredService<AcademyDbContext>();

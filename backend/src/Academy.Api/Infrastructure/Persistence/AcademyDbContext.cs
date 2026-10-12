@@ -1,5 +1,6 @@
 using Academy.Api.Modules.Catalog.Domain;
 using Academy.Api.Modules.Identity;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -7,8 +8,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Academy.Api.Infrastructure.Persistence;
 
 internal sealed class AcademyDbContext(DbContextOptions<AcademyDbContext> options)
-    : IdentityDbContext<User, Role, Guid>(options)
+    : IdentityDbContext<User, Role, Guid>(options), IDataProtectionKeyContext
 {
+    /// <summary>Claves de ASP.NET Core Data Protection (cifran cookies de sesión y tokens antiforgery).</summary>
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
+
     public DbSet<School> Schools => Set<School>();
 
     public DbSet<Technology> Technologies => Set<Technology>();

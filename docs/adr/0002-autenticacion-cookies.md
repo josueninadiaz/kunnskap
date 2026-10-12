@@ -1,6 +1,6 @@
 # ADR 0002: Autenticación con ASP.NET Core Identity y cookies en el mismo origen
 
-- **Estado:** aceptada (se implementa en la fase 2)
+- **Estado:** aceptada e implementada (fase 2, tarea 1)
 - **Fecha:** 2026-10-12
 
 ## Contexto
@@ -9,6 +9,7 @@ La aplicación es una SPA servida junto a su API. Hay que proteger las cuentas d
 
 ## Decisión
 
+- Por defecto, la sesión termina al cerrar el navegador. La persistencia (14 días, renovable) es opcional, porque muchas personas usarán ordenadores compartidos.
 - Usar **ASP.NET Core Identity** para el hash de contraseñas, el bloqueo de cuentas, los *security stamps* y los tokens de confirmación.
 - Mantener la sesión con una **cookie `HttpOnly`, `Secure` y `SameSite=Strict`**.
 - Servir el frontend y la API desde el **mismo origen**: el proxy de Vite en desarrollo y el mismo dominio en producción.

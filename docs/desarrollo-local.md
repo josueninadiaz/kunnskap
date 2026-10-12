@@ -75,6 +75,16 @@ npm run dev
 
 Abre `http://localhost:5173`. Vite redirige las peticiones de `/api` a la API, así que el navegador lo ve todo como un solo origen.
 
+## Crear el primer administrador
+
+Por seguridad, ningún endpoint HTTP permite convertirse en administrador. Regístrate en la web y, desde la terminal, ejecuta:
+
+```bash
+dotnet run --project backend/src/Academy.Api -- roles grant tu-correo@ejemplo.org Admin
+```
+
+Cierra la sesión y vuelve a entrar para que se apliquen los nuevos permisos. Los roles disponibles son Student, Instructor, Editor y Admin, y se pueden retirar con `roles revoke`.
+
 ## 5. Pruebas y comprobaciones
 
 ```bash

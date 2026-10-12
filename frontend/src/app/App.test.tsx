@@ -1,11 +1,15 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { config } from '../lib/config'
 import { ORIGINAL_ATTRIBUTION } from '../lib/legal'
-import { renderRoute } from '../test/render'
+import { mockApi, renderRoute } from '../test/render'
 
 describe('aplicación', () => {
+  beforeEach(() => {
+    mockApi()
+  })
+
   it('muestra la página de inicio con el nombre configurable y el aviso de no acreditación', () => {
     renderRoute('/')
 

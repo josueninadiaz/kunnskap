@@ -18,7 +18,8 @@ builder.Services.AddOpenTelemetry().WithTracing(tracing => tracing.AddNpgsql());
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddPlatformOptions(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
-builder.Services.AddIdentityModule();
+builder.Services.AddIdentityModule(builder.Environment);
+builder.Services.AddConfiguredRateLimiting(builder.Configuration);
 
 builder.Services.AddProblemDetailsHandling();
 builder.Services.AddValidation();
@@ -30,6 +31,14 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+await app.ApplyMigrationsIfConfiguredAsync();
+
+// Comandos de operación (p. ej. crear el primer administrador): se ejecutan y terminan sin levantar el servidor.
+if (RoleCommands.IsRoleCommand(args))
+{
+    return await RoleCommands.RunAsync(app.Services, args);
+}
+
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
@@ -40,6 +49,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseSecurityHeaders();
 app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseRateLimiter();
 
 if (app.Environment.IsDevelopment())
 {
@@ -47,8 +59,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapDefaultEndpoints();
-app.MapPlatformEndpoints();
 
-await app.ApplyMigrationsIfConfiguredAsync();
+// Todas las rutas de la API cuelgan de /api y exigen el token antiforgery en peticiones que modifican datos.
+var api = app.MapGroup("/api").AddEndpointFilter<AntiforgeryFilter>();
+api.MapPlatformEndpoints();
+api.MapAuthEndpoints();
+api.MapUserAdminEndpoints();
 
 await app.RunAsync();
+return 0;

@@ -13,6 +13,8 @@
   --fg: #1c1917;
   --fg-muted: #57534e;
   --border: #d6d3d1;
+  /* Borde de controles de formulario: contraste ≥ 3:1 (WCAG 1.4.11). */
+  --border-strong: #78716c;
   --accent: #0f766e;
   --accent-hover: #115e59;
   --accent-fg: #ffffff;
@@ -35,6 +37,7 @@
     --fg: #f5f5f4;
     --fg-muted: #a8a29e;
     --border: #44403c;
+    --border-strong: #a8a29e;
     --accent: #2dd4bf;
     --accent-hover: #5eead4;
     --accent-fg: #042f2e;
@@ -57,6 +60,7 @@
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-fg: var(--accent-fg);

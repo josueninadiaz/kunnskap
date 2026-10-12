@@ -11,9 +11,9 @@ internal sealed record HealthResponse(string Status, bool Database);
 
 internal static class PlatformEndpoints
 {
-    public static IEndpointRouteBuilder MapPlatformEndpoints(this IEndpointRouteBuilder app)
+    public static IEndpointRouteBuilder MapPlatformEndpoints(this IEndpointRouteBuilder api)
     {
-        var group = app.MapGroup("/api").WithTags("Platform");
+        var group = api.MapGroup("").WithTags("Platform");
 
         group.MapGet("/platform", GetPlatformInfo)
             .WithSummary("Datos públicos de la plataforma (nombre configurable, idioma por defecto).");
@@ -21,7 +21,7 @@ internal static class PlatformEndpoints
         group.MapGet("/health", GetHealthAsync)
             .WithSummary("Estado de la API y de la conexión con la base de datos.");
 
-        return app;
+        return api;
     }
 
     private static Ok<PlatformInfoResponse> GetPlatformInfo(IOptions<PlatformOptions> options) =>
