@@ -1,0 +1,8 @@
+slug: javascript-desde-cero
+school: desarrollo-web
+order: 3
+title: "JavaScript desde cero"
+summary: "Los fundamentos del lenguaje de la web: variables, funciones, objetos y arreglos."
+level: Beginner
+status: InDevelopment
+technologies: [javascript]

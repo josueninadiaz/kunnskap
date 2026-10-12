@@ -1,0 +1,8 @@
+slug: sql-y-diseno-de-bases-de-datos
+school: backend-dotnet
+order: 4
+title: "SQL y diseño de bases de datos"
+summary: "Diseña tablas, relaciones e índices y escribe consultas SQL con PostgreSQL."
+level: Beginner
+status: InDevelopment
+technologies: [sql, postgresql]

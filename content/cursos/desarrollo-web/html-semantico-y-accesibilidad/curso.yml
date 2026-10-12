@@ -1,0 +1,8 @@
+slug: html-semantico-y-accesibilidad
+school: desarrollo-web
+order: 1
+title: "HTML semántico y accesibilidad"
+summary: "Estructura páginas web con el significado correcto para que funcionen con lectores de pantalla y teclado."
+level: Beginner
+status: InDevelopment
+technologies: [html]

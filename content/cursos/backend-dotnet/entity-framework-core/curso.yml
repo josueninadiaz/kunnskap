@@ -1,0 +1,8 @@
+slug: entity-framework-core
+school: backend-dotnet
+order: 5
+title: "Entity Framework Core"
+summary: "Accede a bases de datos desde .NET con modelos, consultas y migraciones."
+level: Intermediate
+status: InDevelopment
+technologies: [efcore, dotnet, postgresql]

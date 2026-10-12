@@ -1,0 +1,25 @@
+# Escuelas del catálogo. El orden define cómo se muestran.
+- slug: fundamentos
+  order: 1
+  name: Fundamentos digitales y programación
+  description: "Usar el ordenador para desarrollar, programar desde cero con C# y colaborar con Git y GitHub. Es el punto de partida si nunca has programado."
+
+- slug: desarrollo-web
+  order: 2
+  name: Desarrollo web
+  description: "HTML semántico y accesible, CSS adaptable, JavaScript, React con TypeScript, consumo de APIs y pruebas. Proyecto de la ruta: una aplicación web útil, accesible y publicada."
+
+- slug: backend-dotnet
+  order: 3
+  name: Backend con C# y .NET
+  description: "C#, orientación a objetos, SQL, Entity Framework Core, ASP.NET Core, seguridad, pruebas y arquitectura. Proyecto de la ruta: una API completa con PostgreSQL, autenticación, pruebas y despliegue."
+
+- slug: inteligencia-artificial
+  order: 4
+  name: Inteligencia artificial aplicada
+  description: "Python, análisis de datos, APIs de IA, prompts, búsqueda semántica, RAG y uso responsable. Proyecto de la ruta: un asistente educativo que cita sus fuentes y reconoce lo que no sabe."
+
+- slug: ciberseguridad
+  order: 5
+  name: Ciberseguridad defensiva
+  description: "Redes, Linux, autenticación, seguridad web, registros, vulnerabilidades e incidentes, siempre en laboratorios legales y controlados. Proyecto de la ruta: un informe de detección y mitigación sobre registros sintéticos."

@@ -1,0 +1,8 @@
+slug: fundamentos-de-csharp
+school: backend-dotnet
+order: 1
+title: "Fundamentos de C#"
+summary: "El lenguaje C# en profundidad para quien ya sabe programar, en C# o en otro lenguaje."
+level: Beginner
+status: InDevelopment
+technologies: [csharp, dotnet]

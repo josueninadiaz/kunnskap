@@ -1,0 +1,8 @@
+slug: python-para-principiantes
+school: inteligencia-artificial
+order: 2
+title: "Python para principiantes"
+summary: "El lenguaje más usado en ciencia de datos e IA, desde cero."
+level: Beginner
+status: InDevelopment
+technologies: [python]

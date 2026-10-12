@@ -1,0 +1,8 @@
+slug: validacion-de-entradas-y-control-de-acceso
+school: ciberseguridad
+order: 6
+title: "Validación de entradas y control de acceso"
+summary: "Evita inyecciones y accesos indebidos validando datos y permisos en el servidor."
+level: Intermediate
+status: InDevelopment
+technologies: []

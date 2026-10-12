@@ -1,0 +1,8 @@
+slug: css-diseno-adaptable
+school: desarrollo-web
+order: 2
+title: "CSS, diseño adaptable y layouts"
+summary: "Da estilo a tus páginas y haz que se vean bien en móviles y ordenadores con Flexbox y Grid."
+level: Beginner
+status: InDevelopment
+technologies: [css]

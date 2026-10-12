@@ -1,0 +1,8 @@
+slug: autenticacion-autorizacion-y-seguridad
+school: backend-dotnet
+order: 7
+title: "Autenticación, autorización y seguridad"
+summary: "Protege tus APIs: identidad, cookies y tokens, permisos y las vulnerabilidades más comunes."
+level: Advanced
+status: InDevelopment
+technologies: [aspnetcore, dotnet]

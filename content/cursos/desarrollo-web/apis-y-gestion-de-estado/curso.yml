@@ -1,0 +1,8 @@
+slug: apis-y-gestion-de-estado
+school: desarrollo-web
+order: 6
+title: "Consumo de APIs y gestión de estados"
+summary: "Conecta tu aplicación a APIs reales y gestiona estados de carga, error y éxito."
+level: Intermediate
+status: InDevelopment
+technologies: [react, typescript]

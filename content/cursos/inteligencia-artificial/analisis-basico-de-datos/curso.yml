@@ -1,0 +1,8 @@
+slug: analisis-basico-de-datos
+school: inteligencia-artificial
+order: 3
+title: "Manipulación y análisis básico de datos"
+summary: "Carga, limpia y analiza datos tabulares para responder preguntas concretas."
+level: Beginner
+status: InDevelopment
+technologies: [python]

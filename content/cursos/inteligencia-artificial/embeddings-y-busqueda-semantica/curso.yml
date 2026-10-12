@@ -1,0 +1,8 @@
+slug: embeddings-y-busqueda-semantica
+school: inteligencia-artificial
+order: 6
+title: "Embeddings y búsqueda semántica"
+summary: "Busca por significado, no solo por palabras, usando representaciones vectoriales."
+level: Intermediate
+status: InDevelopment
+technologies: [python]

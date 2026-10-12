@@ -1,0 +1,8 @@
+slug: aspnet-core-web-api
+school: backend-dotnet
+order: 6
+title: "ASP.NET Core Web API"
+summary: "Construye APIs HTTP con validación, manejo de errores y documentación OpenAPI."
+level: Intermediate
+status: InDevelopment
+technologies: [aspnetcore, dotnet]

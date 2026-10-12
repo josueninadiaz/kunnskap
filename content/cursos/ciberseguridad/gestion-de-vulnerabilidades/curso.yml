@@ -1,0 +1,8 @@
+slug: gestion-de-vulnerabilidades
+school: ciberseguridad
+order: 8
+title: "Gestión de vulnerabilidades"
+summary: "Identifica, prioriza y corrige vulnerabilidades en dependencias y sistemas."
+level: Intermediate
+status: InDevelopment
+technologies: []

@@ -1,0 +1,8 @@
+slug: arquitectura-modular
+school: backend-dotnet
+order: 9
+title: "Arquitectura modular y buenas prácticas"
+summary: "Organiza aplicaciones que puedan mantenerse durante años y documenta tus decisiones."
+level: Advanced
+status: InDevelopment
+technologies: [dotnet]

@@ -1,0 +1,8 @@
+slug: pruebas-y-despliegue-web
+school: desarrollo-web
+order: 7
+title: "Pruebas y despliegue de aplicaciones web"
+summary: "Escribe pruebas automatizadas y publica tu aplicación con integración continua."
+level: Intermediate
+status: InDevelopment
+technologies: [typescript]

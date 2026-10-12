@@ -1,0 +1,8 @@
+slug: logs-y-monitorizacion
+school: ciberseguridad
+order: 7
+title: "Logs y monitorización"
+summary: "Registra lo importante sin exponer datos sensibles y detecta comportamientos anómalos."
+level: Intermediate
+status: InDevelopment
+technologies: [linux]

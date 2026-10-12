@@ -1,0 +1,8 @@
+slug: consumo-de-apis-de-ia
+school: inteligencia-artificial
+order: 4
+title: "Consumo de APIs de IA"
+summary: "Integra modelos de lenguaje en tus aplicaciones controlando costes y errores."
+level: Intermediate
+status: InDevelopment
+technologies: [python]

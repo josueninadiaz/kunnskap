@@ -1,0 +1,8 @@
+slug: generacion-aumentada-por-recuperacion
+school: inteligencia-artificial
+order: 7
+title: "Generación aumentada por recuperación (RAG)"
+summary: "Construye asistentes que responden con documentos propios y citan sus fuentes."
+level: Advanced
+status: InDevelopment
+technologies: [python]

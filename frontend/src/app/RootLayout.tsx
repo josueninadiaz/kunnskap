@@ -5,6 +5,7 @@ import { CODE_LICENSE, CONTENT_LICENSE, ORIGINAL_ATTRIBUTION, sourceUrl } from '
 
 const navItems = [
   { to: '/', label: 'Inicio', end: true },
+  { to: '/cursos', label: 'Cursos', end: false },
   { to: '/contribuir', label: 'Contribuir', end: false },
   { to: '/estado', label: 'Estado', end: false },
 ] as const

@@ -1,49 +1,66 @@
-import { BookOpenCheck, Brain, Code2, Server, ShieldCheck } from 'lucide-react'
+import { BookOpenCheck, Brain, Code2, GraduationCap, type LucideIcon, Server, ShieldCheck } from 'lucide-react'
 import { useEffect } from 'react'
+import { Link } from 'react-router'
 import { ButtonLink } from '../../components/ui/Button'
+import { StatusMessage } from '../../components/ui/StatusMessage'
+import { describeError } from '../../lib/api'
 import { config } from '../../lib/config'
+import { useCatalogFacets } from '../catalog/catalogApi'
 
-/*
- * Descripción de las áreas planificadas. No es el catálogo: los cursos se servirán desde la API
- * (fase 2). Aquí solo se indica, con honestidad, en qué estado está cada área.
- */
-const areas = [
-  {
-    icon: BookOpenCheck,
-    title: 'Fundamentos digitales y programación',
-    description: 'Uso del ordenador para desarrollar, programar desde cero con C# y .NET, Git y GitHub.',
-    project: 'Un primer programa documentado y publicado en un repositorio propio.',
-    status: 'Primera ruta · en preparación',
-  },
-  {
-    icon: Code2,
-    title: 'Desarrollo web',
-    description: 'HTML semántico y accesible, CSS adaptable, JavaScript, React con TypeScript, APIs y pruebas.',
-    project: 'Una aplicación web útil, accesible y publicada, con documentación.',
-    status: 'Planificada',
-  },
-  {
-    icon: Server,
-    title: 'Backend con C# y .NET',
-    description: 'C#, orientación a objetos, SQL, Entity Framework Core, ASP.NET Core, seguridad y pruebas.',
-    project: 'Una API completa con PostgreSQL, autenticación, pruebas y despliegue.',
-    status: 'Planificada',
-  },
-  {
-    icon: Brain,
-    title: 'Inteligencia artificial aplicada',
-    description: 'Python, análisis de datos, APIs de IA, prompts, búsqueda semántica, RAG y uso responsable.',
-    project: 'Un asistente educativo que responde con fuentes citadas y reconoce lo que no sabe.',
-    status: 'Planificada',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Ciberseguridad defensiva',
-    description: 'Redes, Linux, autenticación, seguridad web, registros, vulnerabilidades e incidentes.',
-    project: 'Un laboratorio defensivo autorizado con un informe de detección y mitigación.',
-    status: 'Planificada',
-  },
-] as const
+// Icono por escuela; las escuelas nuevas usan el icono genérico.
+const schoolIcons: Record<string, LucideIcon> = {
+  fundamentos: BookOpenCheck,
+  'desarrollo-web': Code2,
+  'backend-dotnet': Server,
+  'inteligencia-artificial': Brain,
+  ciberseguridad: ShieldCheck,
+}
+
+function courseCountLabel(published: number, inDevelopment: number): string {
+  const parts: string[] = []
+  if (published > 0) parts.push(published === 1 ? '1 curso disponible' : `${published} cursos disponibles`)
+  if (inDevelopment > 0) parts.push(inDevelopment === 1 ? '1 en preparación' : `${inDevelopment} en preparación`)
+  return parts.join(' · ') || 'Sin cursos todavía'
+}
+
+function SchoolList() {
+  const facets = useCatalogFacets()
+
+  if (facets.isPending) return <StatusMessage tone="loading" title="Cargando las escuelas…" />
+  if (facets.isError) {
+    return (
+      <StatusMessage tone="error" title="No se pudieron cargar las escuelas">
+        {describeError(facets.error)} También puedes ir directamente al <Link to="/cursos" className="underline">catálogo</Link>.
+      </StatusMessage>
+    )
+  }
+
+  return (
+    <ul className="divide-y divide-border rounded-(--radius-panel) border border-border bg-surface">
+      {facets.data.schools.map((school) => {
+        const Icon = schoolIcons[school.slug] ?? GraduationCap
+        return (
+          <li key={school.slug} className="flex flex-col gap-3 p-5 sm:flex-row sm:gap-5">
+            <Icon aria-hidden="true" className="size-6 shrink-0 text-accent" />
+            <div className="min-w-0 flex-1 space-y-1">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <h3 className="text-lg">
+                  <Link to={`/cursos?escuela=${school.slug}`} className="hover:text-accent hover:underline">
+                    {school.name}
+                  </Link>
+                </h3>
+                <span className="text-xs font-medium text-fg-muted">
+                  {courseCountLabel(school.publishedCourses, school.coursesInDevelopment)}
+                </span>
+              </div>
+              <p className="text-fg-muted">{school.description}</p>
+            </div>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
 
 const audience = [
   'Personas que nunca han programado y quieren empezar desde cero.',
@@ -98,7 +115,7 @@ export function HomePage() {
           preparando la primera ruta, <em>Programación desde cero</em>. Todavía no hay cursos abiertos a inscripción.
         </p>
         <div className="flex flex-wrap gap-3">
-          <ButtonLink to={{ hash: '#areas' }}>Ver qué podrás aprender</ButtonLink>
+          <ButtonLink to="/cursos">Ver el catálogo de cursos</ButtonLink>
           <ButtonLink to="/contribuir" variant="secondary">
             Quiero contribuir
           </ButtonLink>
@@ -136,27 +153,11 @@ export function HomePage() {
             Qué podrás aprender
           </h2>
           <p className="max-w-(--container-prose) text-fg-muted">
-            Cinco escuelas con rutas ordenadas de principiante a nivel profesional. Puedes seguir una ruta completa o
-            elegir cursos sueltos. El catálogo de cursos aparecerá aquí cuando se publique.
+            Escuelas con rutas ordenadas de principiante a nivel profesional. Puedes seguir una ruta completa o elegir
+            cursos sueltos.
           </p>
         </div>
-        <ul className="divide-y divide-border rounded-(--radius-panel) border border-border bg-surface">
-          {areas.map(({ icon: Icon, title, description, project, status }) => (
-            <li key={title} className="flex flex-col gap-3 p-5 sm:flex-row sm:gap-5">
-              <Icon aria-hidden="true" className="size-6 shrink-0 text-accent" />
-              <div className="min-w-0 flex-1 space-y-1">
-                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <h3 className="text-lg">{title}</h3>
-                  <span className="text-xs font-medium text-fg-muted">{status}</span>
-                </div>
-                <p className="text-fg-muted">{description}</p>
-                <p className="text-sm">
-                  <span className="font-medium">Proyecto de la ruta:</span> {project}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <SchoolList />
       </section>
 
       <section aria-labelledby="contribute-title" className="space-y-4 rounded-(--radius-panel) bg-accent-soft p-6 sm:p-8">

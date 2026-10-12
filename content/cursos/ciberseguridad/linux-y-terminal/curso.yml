@@ -1,0 +1,8 @@
+slug: linux-y-terminal
+school: ciberseguridad
+order: 2
+title: "Linux y terminal"
+summary: "Maneja un sistema Linux desde la línea de comandos con confianza."
+level: Beginner
+status: InDevelopment
+technologies: [linux]

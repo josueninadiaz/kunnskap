@@ -21,6 +21,7 @@ namespace Academy.Api.Infrastructure.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "unaccent");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Academy.Api.Modules.Catalog.Domain.Course", b =>
@@ -44,7 +45,7 @@ namespace Academy.Api.Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description_markdown");
 
-                    b.Property<int>("EstimatedMinutes")
+                    b.Property<int?>("EstimatedMinutes")
                         .HasColumnType("integer")
                         .HasColumnName("estimated_minutes");
 
@@ -99,6 +100,15 @@ namespace Academy.Api.Infrastructure.Persistence.Migrations
                         .HasColumnType("text[]")
                         .HasColumnName("software_versions");
 
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.Property<string>("SourcePath")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("source_path");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -137,16 +147,18 @@ namespace Academy.Api.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_courses_slug");
 
-                    b.HasIndex("Status", "SchoolId")
-                        .HasDatabaseName("ix_courses_status_school_id");
+                    b.HasIndex("Status", "SchoolId", "SortOrder")
+                        .HasDatabaseName("ix_courses_status_school_id_sort_order");
 
                     b.ToTable("courses", null, t =>
                         {
-                            t.HasCheckConstraint("ck_courses_estimated_minutes", "estimated_minutes > 0");
+                            t.HasCheckConstraint("ck_courses_estimated_minutes", "estimated_minutes IS NULL OR estimated_minutes > 0");
 
                             t.HasCheckConstraint("ck_courses_level", "level IN ('Beginner', 'Intermediate', 'Advanced')");
 
                             t.HasCheckConstraint("ck_courses_published_at", "status <> 'Published' OR published_at IS NOT NULL");
+
+                            t.HasCheckConstraint("ck_courses_published_duration", "status <> 'Published' OR estimated_minutes IS NOT NULL");
 
                             t.HasCheckConstraint("ck_courses_status", "status IN ('Draft', 'InDevelopment', 'Published', 'Archived')");
                         });

@@ -1,0 +1,8 @@
+slug: colecciones-excepciones-asincronia
+school: backend-dotnet
+order: 3
+title: "Colecciones, excepciones y asincronía"
+summary: "LINQ, manejo de errores y programación asíncrona con async y await."
+level: Intermediate
+status: InDevelopment
+technologies: [csharp, dotnet]

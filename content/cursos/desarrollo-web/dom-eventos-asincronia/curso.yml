@@ -1,0 +1,8 @@
+slug: dom-eventos-asincronia
+school: desarrollo-web
+order: 4
+title: "DOM, eventos y asincronía"
+summary: "Haz páginas interactivas que respondan a la persona usuaria y consulten datos sin recargar."
+level: Intermediate
+status: InDevelopment
+technologies: [javascript]

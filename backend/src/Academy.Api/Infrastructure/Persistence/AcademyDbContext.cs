@@ -27,6 +27,9 @@ internal sealed class AcademyDbContext(DbContextOptions<AcademyDbContext> option
     {
         base.OnModelCreating(builder);
 
+        // Búsqueda sin distinguir tildes en el catálogo ("logica" encuentra "Lógica").
+        builder.HasPostgresExtension("unaccent");
+
         // Nombres de tabla legibles para Identity en lugar de "asp_net_users", etc.
         builder.Entity<User>(b =>
         {

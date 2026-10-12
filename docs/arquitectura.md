@@ -36,6 +36,13 @@ Cada módulo contiene su dominio (`Domain/`), su configuración de EF (`Persiste
 - La concurrencia optimista de los cursos usa la columna `xmin` de PostgreSQL.
 - Los errores se devuelven como `application/problem+json`, sin detalles internos y con un `traceId`.
 
+## Catálogo
+
+- El contenido curricular vive en `content/` (YAML) y `ContentImporter` lo sincroniza con PostgreSQL usando el slug como clave. Es idempotente y nunca borra cursos (ADR 0003).
+- `/api/catalog/*` solo expone cursos `Published` e `InDevelopment`. Los borradores y archivados devuelven 404.
+- La búsqueda usa `ILIKE` con `unaccent()`, de modo que «logica» encuentra «Lógica», y escapa los comodines. Con un catálogo de decenas de cursos no necesita índices. Si crece a miles, habrá que añadir un índice trigram (`pg_trgm`).
+- En Azure Database for PostgreSQL hay que permitir la extensión `unaccent` (parámetro `azure.extensions`).
+
 ## Seguridad (resumen)
 
 - La autenticación usa ASP.NET Core Identity con la cookie `kunnskap_session` (HttpOnly, `SameSite=Strict` y `Secure` fuera de desarrollo). Los endpoints están en `/api/auth/*`.

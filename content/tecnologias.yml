@@ -1,0 +1,16 @@
+# Etiquetas de tecnología para los filtros del catálogo.
+- { slug: csharp, name: "C#" }
+- { slug: dotnet, name: ".NET" }
+- { slug: aspnetcore, name: "ASP.NET Core" }
+- { slug: efcore, name: "Entity Framework Core" }
+- { slug: git, name: "Git" }
+- { slug: github, name: "GitHub" }
+- { slug: html, name: "HTML" }
+- { slug: css, name: "CSS" }
+- { slug: javascript, name: "JavaScript" }
+- { slug: typescript, name: "TypeScript" }
+- { slug: react, name: "React" }
+- { slug: sql, name: "SQL" }
+- { slug: postgresql, name: "PostgreSQL" }
+- { slug: python, name: "Python" }
+- { slug: linux, name: "Linux" }

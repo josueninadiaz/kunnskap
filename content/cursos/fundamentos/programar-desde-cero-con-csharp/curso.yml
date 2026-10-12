@@ -1,0 +1,46 @@
+slug: programar-desde-cero-con-csharp
+school: fundamentos
+order: 2
+title: Programar desde cero con C#
+summary: Aprende lógica de programación escribiendo programas reales en C# con .NET 10, sin experiencia previa y sin instalar nada si usas GitHub Codespaces.
+description: |
+  Un curso para quien nunca ha programado. Desde el primer día escribirás programas que funcionan:
+  con .NET 10 basta un archivo `hola.cs` y el comando `dotnet run hola.cs`, sin proyectos ni configuración.
+
+  Se imparte en **ediciones guiadas con sesiones en vivo**, y también se puede seguir a tu ritmo con las
+  lecciones escritas. Cada lección incluye ejemplos, una actividad práctica y criterios para comprobar lo aprendido.
+level: Beginner
+status: InDevelopment
+technologies: [csharp, dotnet]
+objectives:
+  - Explicar qué es un programa y cómo lo ejecuta el ordenador.
+  - Escribir y ejecutar programas de C# de un solo archivo con `dotnet run`.
+  - Usar variables, tipos de datos y operadores para resolver cálculos sencillos.
+  - Tomar decisiones con condiciones y repetir tareas con bucles.
+  - Organizar el código en funciones reutilizables.
+  - Guardar y recorrer datos con listas y diccionarios.
+  - Leer mensajes de error y depurar programas sencillos.
+  - Construir y explicar un pequeño proyecto final propio.
+prerequisites:
+  - Ninguna experiencia en programación.
+  - Saber usar un navegador y manejar archivos y carpetas. Si no, empieza por «Alfabetización digital para el desarrollo».
+  - Un ordenador con .NET 10 instalado, o una cuenta gratuita de GitHub para programar desde el navegador con Codespaces.
+authors: [Josue Nina Diaz]
+softwareVersions: [".NET 10"]
+modules:
+  - title: Tu primer programa
+    summary: Qué es programar, cómo preparar el entorno (en tu equipo o en Codespaces) y ejecutar tu primer `dotnet run hola.cs`.
+  - title: Datos y operaciones
+    summary: Variables, tipos de datos, operadores, y leer y escribir en la consola.
+  - title: Tomar decisiones
+    summary: Expresiones booleanas, `if`, `else` y `switch`.
+  - title: Repetir tareas
+    summary: Bucles `while`, `for` y `foreach`, y cómo evitar bucles infinitos.
+  - title: Funciones
+    summary: Dividir un problema en partes, con parámetros y valores de retorno.
+  - title: Colecciones
+    summary: Arreglos, `List<T>` y `Dictionary<TKey, TValue>`.
+  - title: Errores y depuración
+    summary: Leer mensajes de error, excepciones básicas y uso del depurador.
+  - title: Proyecto final
+    summary: Diseñar, programar y documentar un programa propio que resuelva un problema real.

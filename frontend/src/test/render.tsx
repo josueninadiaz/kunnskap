@@ -26,23 +26,37 @@ export function jsonResponse(body: unknown, status = 200): Response {
   })
 }
 
+export const facetsFixture = {
+  schools: [
+    { slug: 'fundamentos', name: 'Fundamentos digitales y programación', description: 'Punto de partida.', publishedCourses: 0, coursesInDevelopment: 3 },
+    { slug: 'ciberseguridad', name: 'Ciberseguridad defensiva', description: 'Laboratorios legales.', publishedCourses: 1, coursesInDevelopment: 8 },
+  ],
+  technologies: [{ slug: 'csharp', name: 'C#' }],
+  levels: ['Beginner', 'Intermediate', 'Advanced'],
+}
+
 type Handler = (init: RequestInit | undefined) => Response | Promise<Response>
 
 /** Respuestas por defecto: visitante sin sesión y token antiforgery disponible. */
 const defaultHandlers: Record<string, Handler> = {
   'GET /api/auth/me': () => jsonResponse({ title: 'No autorizado', status: 401 }, 401),
   'GET /api/auth/antiforgery': () => jsonResponse({ token: 'token-de-prueba' }),
+  'GET /api/catalog/facets': () => jsonResponse(facetsFixture),
 }
 
 /**
  * Simula la API por método y ruta, p. ej. { 'POST /api/auth/login': () => jsonResponse(user) }.
+ * Un "*" final permite coincidir por prefijo (útil con parámetros de consulta).
  * Una petición no simulada hace fallar la prueba, para no ocultar llamadas inesperadas.
  */
 export function mockApi(handlers: Record<string, Handler> = {}) {
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
     const key = `${(init?.method ?? 'GET').toUpperCase()} ${url}`
-    const handler = handlers[key] ?? defaultHandlers[key]
+    const all = { ...defaultHandlers, ...handlers }
+    // Coincidencia exacta o por prefijo con "*" al final (p. ej. 'GET /api/catalog/courses?*').
+    const handler =
+      all[key] ?? Object.entries(all).find(([k]) => k.endsWith('*') && key.startsWith(k.slice(0, -1)))?.[1]
     if (!handler) throw new Error(`Petición no simulada: ${key}`)
     return handler(init)
   })

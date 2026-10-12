@@ -1,0 +1,8 @@
+slug: react-con-typescript
+school: desarrollo-web
+order: 5
+title: "React con TypeScript"
+summary: "Construye interfaces con componentes reutilizables y tipado estático."
+level: Intermediate
+status: InDevelopment
+technologies: [react, typescript]

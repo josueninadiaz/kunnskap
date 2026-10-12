@@ -1,0 +1,8 @@
+slug: programacion-orientada-a-objetos
+school: backend-dotnet
+order: 2
+title: "Programación orientada a objetos"
+summary: "Clases, interfaces, herencia y composición para modelar problemas reales en C#."
+level: Intermediate
+status: InDevelopment
+technologies: [csharp]

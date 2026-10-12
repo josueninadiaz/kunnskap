@@ -71,7 +71,17 @@ internal sealed class Course : IAuditable
 
     public ContentStatus Status { get; set; } = ContentStatus.Draft;
 
-    public int EstimatedMinutes { get; set; }
+    /// <summary>Posición dentro de la escuela.</summary>
+    public int SortOrder { get; set; }
+
+    /// <summary>Duración estimada. Opcional mientras el curso no está publicado: no se inventan duraciones.</summary>
+    public int? EstimatedMinutes { get; set; }
+
+    /// <summary>
+    /// Ruta del archivo en <c>content/</c> si el curso se gestiona desde el repositorio (ADR 0003);
+    /// null si se creó desde el panel de administración.
+    /// </summary>
+    public string? SourcePath { get; set; }
 
     public string Language { get; set; } = "es";
 

@@ -30,7 +30,8 @@ internal sealed class CourseConfiguration : IEntityTypeConfiguration<Course>
     {
         builder.ToTable(t =>
         {
-            t.HasCheckConstraint("ck_courses_estimated_minutes", "estimated_minutes > 0");
+            t.HasCheckConstraint("ck_courses_estimated_minutes", "estimated_minutes IS NULL OR estimated_minutes > 0");
+            t.HasCheckConstraint("ck_courses_published_duration", "status <> 'Published' OR estimated_minutes IS NOT NULL");
             t.HasCheckConstraint("ck_courses_level", "level IN ('Beginner', 'Intermediate', 'Advanced')");
             t.HasCheckConstraint("ck_courses_status", "status IN ('Draft', 'InDevelopment', 'Published', 'Archived')");
             t.HasCheckConstraint("ck_courses_published_at", "status <> 'Published' OR published_at IS NOT NULL");
@@ -44,10 +45,11 @@ internal sealed class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(c => c.Status).HasConversion<string>().HasMaxLength(20);
         builder.Property(c => c.Language).HasMaxLength(10);
         builder.Property(c => c.LicenseSpdx).HasMaxLength(40);
+        builder.Property(c => c.SourcePath).HasMaxLength(300);
         builder.Property(c => c.Version).IsRowVersion();
 
         // Filtros habituales del catálogo: cursos visibles por escuela.
-        builder.HasIndex(c => new { c.Status, c.SchoolId });
+        builder.HasIndex(c => new { c.Status, c.SchoolId, c.SortOrder });
 
         builder.HasOne(c => c.School)
             .WithMany(s => s.Courses)

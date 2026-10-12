@@ -1,0 +1,8 @@
+slug: git-y-github
+school: fundamentos
+order: 3
+title: "Git y GitHub"
+summary: "Guarda el historial de tu código, colabora con otras personas mediante pull requests y publica tus proyectos."
+level: Beginner
+status: InDevelopment
+technologies: [git, github]

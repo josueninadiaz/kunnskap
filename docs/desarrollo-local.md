@@ -75,6 +75,16 @@ npm run dev
 
 Abre `http://localhost:5173`. Vite redirige las peticiones de `/api` a la API, así que el navegador lo ve todo como un solo origen.
 
+## Contenido del catálogo
+
+Los cursos se definen en [content/](../content/) (YAML). En desarrollo, la API los importa automáticamente al arrancar. Para importarlos a mano, por ejemplo en otro entorno:
+
+```bash
+dotnet run --project backend/src/Academy.Api -- content import
+```
+
+Si un archivo tiene errores, el comando los muestra todos con el archivo y la línea, y no modifica la base de datos. El formato está documentado en [content/README.md](../content/README.md).
+
 ## Crear el primer administrador
 
 Por seguridad, ningún endpoint HTTP permite convertirse en administrador. Regístrate en la web y, desde la terminal, ejecuta:

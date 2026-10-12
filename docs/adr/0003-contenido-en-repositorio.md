@@ -1,6 +1,6 @@
 # ADR 0003: Contenido educativo versionado en el repositorio e importado a la base de datos
 
-- **Estado:** propuesta (se confirmará en la fase 3)
+- **Estado:** aceptada. Implementada para escuelas, tecnologías y cursos con su temario (fase 2, tarea 2). Las lecciones en Markdown llegarán en la fase 3
 - **Fecha:** 2026-10-12
 
 ## Contexto
