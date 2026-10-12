@@ -17,6 +17,33 @@ Comprueba las versiones instaladas:
 docker --version && dotnet --list-sdks && node --version
 ```
 
+## Opción A: sin instalar nada (GitHub Codespaces)
+
+En el repositorio, pulsa **Code → Codespaces → Create codespace on main**. Se abrirá VS Code en el navegador con .NET 10, Node.js 24 y Docker ya preparados (ver [.devcontainer/](../.devcontainer/)). Después ejecuta:
+
+```bash
+dotnet run --project backend/src/Academy.AppHost
+```
+
+Codespaces tiene una cuota gratuita mensual para cuentas personales. Consulta los límites vigentes en la [documentación de facturación de Codespaces](https://docs.github.com/es/billing/managing-billing-for-your-products/managing-billing-for-github-codespaces/about-billing-for-github-codespaces). Detén el codespace cuando no lo uses.
+
+## Opción B: con un solo comando (.NET Aspire)
+
+Si ya tienes los requisitos instalados:
+
+```bash
+cd frontend && npm install && cd ..
+dotnet run --project backend/src/Academy.AppHost
+```
+
+[Aspire](https://learn.microsoft.com/dotnet/aspire/) levanta PostgreSQL en un contenedor, la API y la web, y abre su **panel** (`http://localhost:15214`). En el panel ves el estado de cada servicio, los logs, las trazas (incluidas las consultas SQL) y las métricas. La contraseña de PostgreSQL la genera Aspire y se guarda en los secretos de usuario del AppHost. Los datos se conservan en el volumen `kunnskap-aspire-postgres`.
+
+> La primera vez que Aspire se ejecuta con el perfil `https`, puede pedir que confíes en el certificado de desarrollo de `localhost`. El perfil por defecto es `http` y no lo necesita. Para eliminar ese certificado: `dotnet dev-certs https --clean`.
+
+## Opción C: paso a paso (Docker Compose)
+
+Útil si no quieres usar Aspire o solo trabajas en una parte del proyecto. Los apartados 2 a 4 explican cada pieza.
+
 ## 2. Base de datos
 
 ```bash

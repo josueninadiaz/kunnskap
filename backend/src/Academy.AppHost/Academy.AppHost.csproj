@@ -1,0 +1,28 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.6.1">
+
+  <!--
+    Orquestación del entorno local: PostgreSQL, API y frontend con un solo comando
+    (ver docs/desarrollo-local.md).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!--
+      Sin el bundle de la CLI de Aspire, que al arrancar instala y marca como de confianza el
+      certificado de desarrollo sin preguntar. El AppHost funciona igual con el perfil http.
+      Ver ADR 0005.
+    -->
+    <AspireUseCliBundle>false</AspireUseCliBundle>
+    <NoWarn>$(NoWarn);ASPIRE010</NoWarn>
+    <UserSecretsId>academy-apphost-dev</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+    <PackageReference Include="Aspire.Hosting.JavaScript" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Academy.Api\Academy.Api.csproj" />
+  </ItemGroup>
+
+</Project>

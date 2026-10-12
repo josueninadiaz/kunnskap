@@ -17,7 +17,8 @@ Kunnskap es una plataforma educativa **gratuita y de código abierto** para apre
 | Parte | Tecnologías |
 |---|---|
 | Frontend | React 19, TypeScript (estricto), Vite, React Router, Tailwind CSS 4, TanStack Query |
-| Backend | C# / ASP.NET Core (.NET 10 LTS), Minimal APIs, EF Core, ASP.NET Core Identity |
+| Backend | C# / ASP.NET Core (.NET 10 LTS), Minimal APIs, EF Core, ASP.NET Core Identity, OpenTelemetry |
+| Entorno local | .NET Aspire, Dev Container / GitHub Codespaces, Docker Compose |
 | Base de datos | PostgreSQL 17 con migraciones de EF Core |
 | Pruebas | xUnit v3 con Testcontainers (PostgreSQL real), Vitest y Testing Library |
 | CI | GitHub Actions |
@@ -26,15 +27,16 @@ Los motivos de cada decisión están en [docs/arquitectura.md](docs/arquitectura
 
 ## Empezar en 5 minutos
 
-Necesitas tener instalados [Docker](https://docs.docker.com/get-docker/), el [SDK de .NET 10](https://dotnet.microsoft.com/download/dotnet/10.0) y [Node.js 24 LTS](https://nodejs.org/).
+**Sin instalar nada:** abre el repositorio en GitHub Codespaces (*Code → Codespaces → Create codespace on main*) y ejecuta `dotnet run --project backend/src/Academy.AppHost`.
+
+**En tu equipo:** necesitas [Docker](https://docs.docker.com/get-docker/), el [SDK de .NET 10](https://dotnet.microsoft.com/download/dotnet/10.0) y [Node.js 24 LTS](https://nodejs.org/).
 
 ```bash
-docker compose up -d db                       # PostgreSQL en 127.0.0.1:5434
-dotnet run --project backend/src/Academy.Api  # API en http://localhost:5080 (aplica las migraciones)
-cd frontend && npm install && npm run dev     # Web en http://localhost:5173
+cd frontend && npm install && cd ..
+dotnet run --project backend/src/Academy.AppHost   # PostgreSQL + API + web, con el panel de Aspire
 ```
 
-La guía completa, con la solución de problemas, está en [docs/desarrollo-local.md](docs/desarrollo-local.md).
+También puedes levantar cada pieza por separado con Docker Compose. La guía completa, con la solución de problemas, está en [docs/desarrollo-local.md](docs/desarrollo-local.md).
 
 ## Estructura
 

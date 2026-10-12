@@ -1,0 +1,32 @@
+// Entorno de desarrollo listo para usar en GitHub Codespaces o en VS Code con Dev Containers.
+// Permite contribuir (y seguir los cursos) desde el navegador, sin instalar nada en tu equipo.
+{
+  "name": "Kunnskap",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:2-10.0-noble",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "24" },
+    // Docker dentro del contenedor: lo usan Aspire (PostgreSQL) y las pruebas de integración (Testcontainers).
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "containerEnv": {
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+    "DOTNET_NOLOGO": "1"
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "forwardPorts": [15214, 5080],
+  "portsAttributes": {
+    "15214": { "label": "Panel de Aspire", "onAutoForward": "openBrowser" },
+    "5080": { "label": "API", "onAutoForward": "silent" }
+  },
+  "otherPortsAttributes": { "onAutoForward": "notify" },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "oxc.oxc-vscode",
+        "bradlc.vscode-tailwindcss",
+        "editorconfig.editorconfig"
+      ]
+    }
+  }
+}

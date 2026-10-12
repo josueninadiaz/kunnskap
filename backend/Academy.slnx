@@ -1,6 +1,8 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Academy.Api/Academy.Api.csproj" />
+    <Project Path="src/Academy.AppHost/Academy.AppHost.csproj" />
+    <Project Path="src/Academy.ServiceDefaults/Academy.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Academy.Api.IntegrationTests/Academy.Api.IntegrationTests.csproj" />

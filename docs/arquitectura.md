@@ -60,6 +60,12 @@ Cada módulo contiene su dominio (`Domain/`), su configuración de EF (`Persiste
 - Solo se usan colores semánticos (`bg-accent`, `text-fg-muted`), nunca colores literales, para mantener el contraste en los dos modos.
 - No se añaden botones ni enlaces que todavía no hagan nada.
 
+## Entorno local y observabilidad
+
+- `backend/src/Academy.AppHost` (Aspire) orquesta PostgreSQL, la API y Vite. Ver [ADR 0005](adr/0005-aspire-entorno-local.md).
+- `backend/src/Academy.ServiceDefaults` añade a la API OpenTelemetry (trazas, métricas y logs), health checks, service discovery y resiliencia de `HttpClient`. Las consultas a PostgreSQL se trazan con `Npgsql.OpenTelemetry`. La telemetría solo se exporta si `OTEL_EXPORTER_OTLP_ENDPOINT` está definido, como ocurre con Aspire o, en el futuro, con Azure Monitor.
+- `docker-compose.yml` se mantiene como alternativa sin Aspire.
+
 ## Pruebas
 
 | Tipo | Herramienta | Qué cubre |

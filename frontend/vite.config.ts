@@ -10,7 +10,8 @@ const apiTarget = process.env.ACADEMY_API_URL ?? 'http://localhost:5080'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    port: 5173,
+    // Aspire asigna el puerto mediante PORT; sin Aspire se usa el 5173 habitual.
+    port: Number(process.env.PORT) || 5173,
     strictPort: true,
     proxy: {
       '/api': { target: apiTarget, changeOrigin: false },

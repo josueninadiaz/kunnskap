@@ -5,9 +5,15 @@ using Academy.Api.Common.Security;
 using Academy.Api.Infrastructure.Persistence;
 using Academy.Api.Modules.Identity;
 using Academy.Api.Modules.Platform;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
+
+// OpenTelemetry, health checks, service discovery y resiliencia (proyecto Academy.ServiceDefaults).
+// Las trazas y métricas solo se exportan si OTEL_EXPORTER_OTLP_ENDPOINT está definido (p. ej. con Aspire).
+builder.AddServiceDefaults();
+builder.Services.AddOpenTelemetry().WithTracing(tracing => tracing.AddNpgsql());
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddPlatformOptions(builder.Configuration);
@@ -40,6 +46,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.MapDefaultEndpoints();
 app.MapPlatformEndpoints();
 
 await app.ApplyMigrationsIfConfiguredAsync();

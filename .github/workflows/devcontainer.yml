@@ -1,0 +1,29 @@
+name: Dev Container
+
+# Comprueba que el entorno de Codespaces se construye y que el proyecto compila y pasa las pruebas dentro de él.
+on:
+  push:
+    branches: [main]
+    paths: ['.devcontainer/**', 'backend/global.json', 'frontend/package.json', '.github/workflows/devcontainer.yml']
+  pull_request:
+    paths: ['.devcontainer/**', 'backend/global.json', 'frontend/package.json', '.github/workflows/devcontainer.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Construir y probar en el Dev Container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            set -e
+            dotnet --version && node --version && docker --version
+            # global.json (con el runner de pruebas) está en backend/, así que se ejecuta desde ahí.
+            (cd backend && dotnet build && dotnet test)
+            (cd frontend && npm test && npm run build)
