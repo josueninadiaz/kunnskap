@@ -1,0 +1,70 @@
+slug: cuestionario-datos-y-operaciones
+title: Comprueba lo que aprendiste en el módulo 2
+passingScore: 70
+questions:
+  - id: que-hace-el-igual
+    type: single
+    prompt: En `edad = 18;`, ¿qué hace el signo `=`?
+    options:
+      - text: Guarda el valor 18 en la variable `edad`.
+        correct: true
+      - text: Comprueba si `edad` vale 18.
+      - text: Crea una variable nueva llamada 18.
+    explanation: "`=` asigna: guarda el valor de la derecha en la variable de la izquierda."
+    hint: En programación, `=` no significa «es igual» como en matemáticas.
+    lesson: variables
+
+  - id: tipo-de-cada-dato
+    type: multiple
+    prompt: ¿Qué emparejamientos de valor y tipo son correctos? Marca todos los correctos.
+    options:
+      - text: "`\"Lima\"` es un `string`."
+        correct: true
+      - text: "`25` es un `int`."
+        correct: true
+      - text: "`18.5` es un `int`."
+      - text: "`true` es un `bool`."
+        correct: true
+    explanation: Los textos van entre comillas (`string`), los enteros son `int`, los números con decimales son `double` y `true` o `false` son `bool`.
+    hint: Hay tres correctos. Fíjate en el número que tiene decimales.
+    lesson: tipos-de-datos
+
+  - id: division-entera
+    type: short
+    prompt: ¿Qué muestra `Console.WriteLine(7 / 2);`?
+    answers: ["3"]
+    explanation: Al dividir dos enteros, C# descarta los decimales, así que `7 / 2` da `3`. Para obtener `3.5` hay que escribir `7.0 / 2`.
+    hint: Los dos números son enteros, y el resultado también lo será.
+    lesson: operadores
+
+  - id: operador-resto
+    type: single
+    prompt: ¿Para qué sirve el operador `%`?
+    options:
+      - text: Para obtener el resto de una división.
+        correct: true
+      - text: Para calcular un porcentaje.
+      - text: Para dividir con decimales.
+    explanation: "`%` da lo que sobra al dividir: `17 % 5` es `2`."
+    hint: Piensa en el reparto de caramelos de la actividad.
+    lesson: operadores
+
+  - id: orden-operaciones
+    type: short
+    prompt: ¿Qué muestra `Console.WriteLine(2 + 3 * 4);`?
+    answers: ["14"]
+    explanation: Primero se multiplica (3 × 4 = 12) y después se suma (2 + 12 = 14). Con paréntesis, `(2 + 3) * 4` daría 20.
+    hint: Como en matemáticas, la multiplicación va antes que la suma.
+    lesson: operadores
+
+  - id: readline-devuelve-texto
+    type: single
+    prompt: Si alguien escribe `17` y lo lees con `Console.ReadLine()`, ¿qué obtienes?
+    options:
+      - text: El texto "17", que hay que convertir con `int.Parse` para hacer cálculos.
+        correct: true
+      - text: El número entero 17, listo para sumar.
+      - text: Un `double` con el valor 17.0.
+    explanation: "`ReadLine` siempre devuelve texto. Para calcular hay que convertirlo, por ejemplo con `int.Parse`."
+    hint: Recuerda qué tipo devuelve siempre `ReadLine`.
+    lesson: leer-datos
