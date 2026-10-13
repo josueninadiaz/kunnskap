@@ -19,7 +19,7 @@ import { StatusMessage } from '../../components/ui/StatusMessage'
 import { describeError } from '../../lib/api'
 import { config } from '../../lib/config'
 import { useCatalogFacets, useCourse } from '../catalog/catalogApi'
-import { Terminal } from './Terminal'
+import { HelloEditor } from './HelloEditor'
 
 /** Curso que se presenta en la portada. */
 const FEATURED_COURSE = 'programar-desde-cero-con-csharp'
@@ -73,38 +73,39 @@ function courseCountLabel(published: number, inDevelopment: number): string {
 
 export function HomePage() {
   useEffect(() => {
-    document.title = `${config.platformName} · Aprende tecnología gratis`
+    document.title = `${config.platformName} · Aprende a programar gratis`
   }, [])
 
   return (
     <>
-      <section aria-labelledby="hero-title" className="stage">
-        <Container className="grid items-center gap-14 py-16 sm:py-24 lg:grid-cols-[1.1fr_1fr] lg:py-28">
-          <div className="space-y-7">
-            <p className="inline-flex items-center gap-2 rounded-full border border-stage-border px-3 py-1 text-sm text-stage-muted">
-              <span aria-hidden="true" className="size-1.5 rounded-full bg-stage-accent" />
-              En construcción: el primer curso está en preparación
-            </p>
-            <h1 id="hero-title" className="display">
-              Aprende a programar gratis, a tu ritmo y con proyectos reales.
-            </h1>
-            <p className="lead max-w-xl text-stage-muted">
-              {config.platformName} es una plataforma educativa gratuita y de código abierto para aprender programación,
-              desarrollo de software, inteligencia artificial y ciberseguridad. Sin experiencia previa, sin una computadora
-              potente y sin pagar herramientas.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <ButtonLink to="/cursos" variant="stage" size="lg">
-                Ver el catálogo de cursos
-              </ButtonLink>
-              <ButtonLink to="/contribuir" variant="stage-secondary" size="lg">
-                Quiero contribuir
-              </ButtonLink>
-            </div>
+      <section aria-labelledby="hero-title" className="overflow-hidden">
+        <Container className="flex flex-col items-center gap-8 pt-16 pb-20 text-center sm:pt-24 sm:pb-28">
+          <p className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-sm text-fg-muted">
+            <span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />
+            Primer curso en preparación
+          </p>
+          <h1 id="hero-title" className="display max-w-4xl">
+            Tu primer programa empieza aquí.
+          </h1>
+          <p className="lead max-w-2xl text-fg-muted">
+            {config.platformName} es una plataforma gratuita y de código abierto para aprender programación, desarrollo de
+            software, inteligencia artificial y ciberseguridad. En español y desde cero.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <ButtonLink to={`/cursos/${FEATURED_COURSE}`} size="lg">
+              Ver el primer curso
+            </ButtonLink>
+            <ButtonLink to="/cursos" variant="secondary" size="lg">
+              Ver todos los cursos
+            </ButtonLink>
           </div>
-          <Terminal />
+          <div className="mt-6 w-full">
+            <HelloEditor />
+          </div>
         </Container>
       </section>
+
+      <FeaturedCourse />
 
       <section aria-labelledby="principles-title" className="py-20 sm:py-28">
         <Container>
@@ -125,9 +126,7 @@ export function HomePage() {
         </Container>
       </section>
 
-      <FeaturedCourse />
-
-      <section id="areas" aria-labelledby="areas-title" className="py-20 sm:py-28">
+      <section id="areas" aria-labelledby="areas-title" className="bg-band py-20 sm:py-28">
         <Container>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div className="max-w-2xl space-y-4">
@@ -149,7 +148,7 @@ export function HomePage() {
         </Container>
       </section>
 
-      <section aria-labelledby="audience-title" className="border-y border-border bg-surface py-20 sm:py-28">
+      <section aria-labelledby="audience-title" className="py-20 sm:py-28">
         <Container className="grid gap-12 lg:grid-cols-[1fr_1.2fr]">
           <h2 id="audience-title" className="headline">
             ¿Para quién es?
@@ -164,21 +163,17 @@ export function HomePage() {
         </Container>
       </section>
 
-      <section aria-labelledby="contribute-title" className="py-20 sm:py-28">
-        <Container>
-          <div className="stage flex flex-col items-start gap-6 rounded-[1.75rem] px-6 py-12 sm:px-12 sm:py-16 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl space-y-3">
-              <h2 id="contribute-title" className="headline">
-                Construyámosla entre todos
-              </h2>
-              <p className="lead text-stage-muted">
-                Si eres desarrollador, educador o simplemente quieres ayudar a revisar materiales, hay un lugar para ti.
-              </p>
-            </div>
-            <ButtonLink to="/contribuir" variant="stage" size="lg">
-              Cómo contribuir
-            </ButtonLink>
-          </div>
+      <section aria-labelledby="contribute-title" className="border-t border-border bg-band py-20 text-center sm:py-28">
+        <Container className="flex flex-col items-center gap-6">
+          <h2 id="contribute-title" className="headline max-w-2xl">
+            Construyámosla entre todos
+          </h2>
+          <p className="lead max-w-xl text-fg-muted">
+            Si eres desarrollador, educador o simplemente quieres ayudar a revisar materiales, hay un lugar para ti.
+          </p>
+          <ButtonLink to="/contribuir" size="lg">
+            Cómo contribuir
+          </ButtonLink>
         </Container>
       </section>
     </>
@@ -193,7 +188,7 @@ function FeaturedCourse() {
   const author = c.authors[0]
 
   return (
-    <section aria-labelledby="featured-title" className="border-y border-border bg-surface py-20 sm:py-28">
+    <section aria-labelledby="featured-title" className="border-y border-border bg-band py-20 sm:py-28">
       <Container className="grid gap-14 lg:grid-cols-[1fr_1fr] lg:gap-20">
         <div className="space-y-6">
           <p className="eyebrow text-accent">
@@ -265,7 +260,7 @@ function SchoolList() {
           <li key={school.slug} className="border-b border-border">
             <Link
               to={`/cursos?escuela=${school.slug}`}
-              className="group grid gap-x-10 gap-y-2 py-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_auto] md:items-baseline"
+              className="group grid gap-x-10 gap-y-2 py-7 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_12rem] md:items-baseline"
             >
               <span className="flex items-baseline gap-3">
                 <Icon aria-hidden="true" className="size-5 shrink-0 translate-y-0.5 text-accent" strokeWidth={1.75} />

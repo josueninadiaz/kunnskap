@@ -18,10 +18,10 @@ const components: Components = {
     )
   },
   code: ({ children }) => (
-    <code className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[0.9em]">{children}</code>
+    <code className="rounded bg-code-bg px-1.5 py-0.5 font-mono text-[0.9em] text-code-fg">{children}</code>
   ),
   pre: ({ children }) => (
-    <pre className="overflow-x-auto rounded-(--radius-control) border border-border bg-surface-muted p-4 text-sm leading-relaxed [&_code]:bg-transparent [&_code]:p-0">
+    <pre className="overflow-x-auto rounded-(--radius-control) border border-border bg-code-bg p-4 text-[0.875rem] leading-relaxed text-code-fg [&_code]:bg-transparent [&_code]:p-0">
       {children}
     </pre>
   ),

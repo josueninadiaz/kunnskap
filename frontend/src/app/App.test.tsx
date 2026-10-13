@@ -10,10 +10,10 @@ describe('aplicación', () => {
     mockApi()
   })
 
-  it('muestra la página de inicio con el nombre configurable y el aviso de no acreditación', () => {
+  it('muestra la página de inicio con el nombre configurable y el aviso de no acreditación', async () => {
     renderRoute('/')
 
-    expect(screen.getByRole('heading', { level: 1, name: /aprende a programar gratis/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Tu primer programa empieza aquí.' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: new RegExp(config.platformName) })).toHaveAttribute('href', '/')
     expect(screen.getByText(/no es una institución acreditada/i)).toBeInTheDocument()
   })

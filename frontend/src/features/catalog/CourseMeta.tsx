@@ -23,14 +23,12 @@ interface CourseFactsProps {
   estimatedMinutes: number | null
   /** El curso está publicado pero aún tiene módulos sin lecciones: la duración es solo de lo publicado. */
   partial?: boolean
-  /** Sobre una escena oscura. */
-  onStage?: boolean
 }
 
-export function CourseFacts({ level, estimatedMinutes, partial = false, onStage = false }: CourseFactsProps) {
+export function CourseFacts({ level, estimatedMinutes, partial = false }: CourseFactsProps) {
   const duration = formatDuration(estimatedMinutes)
   return (
-    <ul className={`flex flex-wrap gap-x-5 gap-y-1.5 text-sm ${onStage ? 'text-stage-muted' : 'text-fg-muted'}`}>
+    <ul className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-fg-muted">
       <li className="inline-flex items-center gap-1.5">
         <GraduationCap aria-hidden="true" className="size-4" />
         <span className="sr-only">Nivel:</span> {levelLabels[level]}

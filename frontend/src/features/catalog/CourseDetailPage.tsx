@@ -78,19 +78,19 @@ function CourseView({ course }: { course: CourseDetail }) {
 
   return (
     <article>
-      <header className="stage">
+      <header className="border-b border-border bg-band">
         <Container className="py-12 sm:py-16 lg:py-20">
           <div className="max-w-3xl space-y-6">
-            <nav aria-label="Ruta de navegación" className="text-sm text-stage-muted">
+            <nav aria-label="Ruta de navegación" className="text-sm text-fg-muted">
               <ol className="flex flex-wrap gap-1">
                 <li>
-                  <Link to="/cursos" className="hover:text-stage-fg hover:underline">
+                  <Link to="/cursos" className="hover:text-fg hover:underline">
                     Cursos
                   </Link>
                   <span aria-hidden="true"> / </span>
                 </li>
                 <li>
-                  <Link to={`/cursos?escuela=${course.school.slug}`} className="hover:text-stage-fg hover:underline">
+                  <Link to={`/cursos?escuela=${course.school.slug}`} className="hover:text-fg hover:underline">
                     {course.school.name}
                   </Link>
                 </li>
@@ -98,23 +98,22 @@ function CourseView({ course }: { course: CourseDetail }) {
             </nav>
             <CourseStatusBadge status={course.status} />
             <PageTitle title={course.title} />
-            <p className="lead text-stage-muted">{course.summary}</p>
+            <p className="lead text-fg-muted">{course.summary}</p>
             <CourseFacts
               level={course.level}
               estimatedMinutes={course.estimatedMinutes}
               partial={published && !course.contentComplete}
-              onStage
             />
             {author ? (
-              <div className="flex items-center gap-3 border-t border-stage-border pt-6">
+              <div className="flex items-center gap-3 border-t border-border pt-6">
                 <span
                   aria-hidden="true"
-                  className="inline-flex size-11 items-center justify-center rounded-full bg-stage-raised text-lg font-semibold text-stage-accent ring-1 ring-stage-border"
+                  className="inline-flex size-11 items-center justify-center rounded-full bg-stage text-lg font-semibold text-stage-accent"
                 >
                   {author.charAt(0)}
                 </span>
                 <span>
-                  <span className="block text-sm text-stage-muted">Curso creado por</span>
+                  <span className="block text-sm text-fg-muted">Curso creado por</span>
                   <span className="font-semibold">{course.authors.join(', ')}</span>
                 </span>
               </div>
