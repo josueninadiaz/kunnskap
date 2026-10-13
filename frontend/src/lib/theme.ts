@@ -25,3 +25,23 @@ export function applyThemePreference(preference: ThemePreference): void {
     // Sin almacenamiento la elección dura hasta recargar; la página funciona igual.
   }
 }
+
+// Almacén compartido: todos los selectores de tema muestran siempre la misma elección.
+const listeners = new Set<() => void>()
+let current: ThemePreference | null = null
+
+export function subscribeTheme(listener: () => void): () => void {
+  listeners.add(listener)
+  return () => listeners.delete(listener)
+}
+
+export function getThemeSnapshot(): ThemePreference {
+  current ??= readThemePreference()
+  return current
+}
+
+export function setThemePreference(preference: ThemePreference): void {
+  current = preference
+  applyThemePreference(preference)
+  for (const listener of listeners) listener()
+}

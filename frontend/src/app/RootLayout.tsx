@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, ScrollRestoration, useLocation } from 'react-router'
 import { Container } from '../components/ui/Container'
 import { Logo } from '../components/ui/Logo'
+import { ReadingPreferencesButton } from '../components/ui/ReadingPreferences'
 import { ThemeToggle } from '../components/ui/ThemeToggle'
 import { AccountMenu } from '../features/auth/AccountMenu'
 import { config } from '../lib/config'
@@ -11,6 +12,7 @@ import { CODE_LICENSE, CONTENT_LICENSE, ORIGINAL_ATTRIBUTION, sourceUrl } from '
 const navItems = [
   { to: '/', label: 'Inicio', end: true },
   { to: '/cursos', label: 'Cursos', end: false },
+  { to: '/herramientas', label: 'Herramientas', end: false },
   { to: '/contribuir', label: 'Contribuir', end: false },
 ] as const
 
@@ -70,7 +72,8 @@ export function RootLayout() {
             </ul>
           </nav>
 
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-2 md:flex">
+            <ReadingPreferencesButton />
             <ThemeToggle />
             <AccountMenu />
           </div>
@@ -101,9 +104,12 @@ export function RootLayout() {
                   ))}
                 </ul>
               </nav>
-              <div className="flex items-center justify-between border-t border-border pt-5">
-                <span className="text-sm text-fg-muted">Apariencia</span>
-                <ThemeToggle />
+              <div className="space-y-2 border-t border-border pt-5">
+                <ReadingPreferencesButton wide />
+                <div className="flex items-center justify-between px-3">
+                  <span className="text-sm text-fg-muted">Apariencia</span>
+                  <ThemeToggle />
+                </div>
               </div>
               <AccountMenu stacked />
             </Container>
@@ -138,6 +144,11 @@ export function RootLayout() {
                 </Link>
               </li>
               <li>
+                <Link to="/herramientas" className="hover:text-accent">
+                  Caja de herramientas
+                </Link>
+              </li>
+              <li>
                 <Link to="/estado" className="hover:text-accent">
                   Estado del servicio
                 </Link>
@@ -150,6 +161,11 @@ export function RootLayout() {
               <li>
                 <Link to="/contribuir" className="hover:text-accent">
                   Cómo contribuir
+                </Link>
+              </li>
+              <li>
+                <Link to="/accesibilidad" className="hover:text-accent">
+                  Accesibilidad e inclusión
                 </Link>
               </li>
               <li>

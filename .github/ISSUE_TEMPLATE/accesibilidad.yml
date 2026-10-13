@@ -1,0 +1,31 @@
+name: Barrera de accesibilidad
+description: Algo te impide usar la plataforma o seguir un curso.
+labels: ["accesibilidad"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por avisarnos: las barreras de accesibilidad tienen prioridad. No incluyas datos personales que no quieras compartir.
+  - type: textarea
+    id: que-intentabas
+    attributes:
+      label: ¿Qué intentabas hacer?
+    validations:
+      required: true
+  - type: textarea
+    id: que-paso
+    attributes:
+      label: ¿Qué pasó?
+      description: Describe la barrera con tus palabras.
+    validations:
+      required: true
+  - type: input
+    id: apoyo
+    attributes:
+      label: Herramienta de apoyo (opcional)
+      description: Por ejemplo, NVDA con Firefox, VoiceOver en iPhone, ampliador de pantalla, teclado…
+  - type: input
+    id: pagina
+    attributes:
+      label: Página (opcional)
+      placeholder: "Ej.: /cursos/programar-desde-cero-con-csharp"

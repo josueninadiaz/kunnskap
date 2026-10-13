@@ -9,11 +9,14 @@
     <meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#070d15" media="(prefers-color-scheme: dark)" />
     <title>%VITE_PLATFORM_NAME%</title>
-    <!-- Aplica el tema elegido antes del primer pintado para evitar un destello del tema equivocado. -->
+    <!-- Aplica el tema y las preferencias de lectura antes del primer pintado (sin destellos ni saltos). -->
     <script>
       try {
         var t = localStorage.getItem('kunnskap.theme')
         if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t)
+        var p = JSON.parse(localStorage.getItem('kunnskap.preferencias') || '{}')
+        var d = { text: 'normal', spacing: 'normal', font: 'estandar', motion: 'sistema', links: 'normal' }
+        for (var k in d) if (typeof p[k] === 'string' && p[k] !== d[k]) document.documentElement.setAttribute('data-' + k, p[k])
       } catch (e) {}
     </script>
   </head>

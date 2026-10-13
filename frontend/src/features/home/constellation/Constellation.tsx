@@ -3,13 +3,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import dotnetLogo from '../../../assets/brand/dotnet-logo.svg'
 import { apiGet } from '../../../lib/api'
+import { prefersReducedMotion } from '../../../lib/preferences'
 import { type CourseListItem, type Paged, useCatalogFacets } from '../../catalog/catalogApi'
 import { buildConstellation, type Constellation as ConstellationData, project, rotate } from './layout'
 
 /** ¿Merece la pena cargar la escena 3D en este equipo? */
 function canRender3D(): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
+  if (prefersReducedMotion()) return false
   const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
   if (connection?.saveData) return false
   try {

@@ -76,6 +76,8 @@ Cada módulo contiene su dominio (`Domain/`), su configuración de EF (`Persiste
 - Solo se usan colores semánticos (`bg-accent`, `text-fg-muted`), nunca colores literales, para mantener el contraste en los dos modos. Sobre una escena oscura se usan los tokens `stage-*`.
 - La preferencia de tema se guarda en `localStorage` (`lib/theme.ts`) y un script en `index.html` la aplica antes del primer pintado. Si el almacenamiento no está disponible, se usa el tema del sistema.
 - Las páginas con escena oscura (portada y detalle de curso) ocupan todo el ancho; el resto usa `PageLayout`.
+- **Accesibilidad e inclusión:** el panel «Preferencias de lectura» (`components/ui/ReadingPreferences.tsx`, `lib/preferences.ts`) aplica atributos `data-text`, `data-spacing`, `data-font`, `data-motion` y `data-links` en `<html>`, a los que reacciona el CSS. Las lecciones se pueden escuchar con la síntesis de voz del navegador (`features/learning/ListenButton.tsx`); no se envía texto a ningún servicio. La página `/accesibilidad` describe lo disponible y lo pendiente.
+- **Caja de herramientas** (`features/tools/toolbox.ts`): lista curada de herramientas y APIs públicas, con cada enlace comprobado y la fecha de comprobación. Se edita mediante pull request.
 - No se añaden botones ni enlaces que todavía no hagan nada.
 
 ## Entorno local y observabilidad

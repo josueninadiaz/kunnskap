@@ -2,6 +2,8 @@
 @import '@fontsource-variable/geist';
 @import '@fontsource-variable/geist-mono';
 @import '@fontsource-variable/familjen-grotesk';
+/* Solo se descarga si alguien activa la tipografía de alta legibilidad. */
+@import '@fontsource-variable/atkinson-hyperlegible-next';
 
 /*
  * Sistema de diseño de Kunnskap.
@@ -56,6 +58,10 @@
   --stage-muted: #a8b7c8;
   --stage-accent: #6fe3b4;
   --stage-border: rgb(255 255 255 / 0.12);
+
+  /* Calidez nórdica: frutos del bosque escandinavo, solo para ilustración y detalles. */
+  --cloudberry: #f2a541;
+  --lingonberry: #d6455d;
 
   /* Violeta oficial de .NET (guías de marca de dotnet/brand): solo para identificar tecnología .NET. */
   --dotnet: #512bd4;
@@ -171,6 +177,8 @@
   --color-stage-muted: var(--stage-muted);
   --color-stage-accent: var(--stage-accent);
   --color-stage-border: var(--stage-border);
+  --color-cloudberry: var(--cloudberry);
+  --color-lingonberry: var(--lingonberry);
   --color-dotnet: var(--dotnet);
   --color-dotnet-bright: var(--dotnet-bright);
   --color-dotnet-text: var(--dotnet-text);
@@ -341,4 +349,55 @@
     transform: translateY(1.1rem);
     opacity: 0;
   }
+}
+
+/* ——— Preferencias de lectura (panel «Preferencias de lectura», lib/preferences.ts) ——— */
+
+/* Todo el tamaño de la interfaz está en rem: cambiar la raíz escala texto y espacios. */
+:root[data-text='grande'] {
+  font-size: 112.5%;
+}
+
+:root[data-text='muy-grande'] {
+  font-size: 125%;
+}
+
+/* Espaciado de texto ampliado según WCAG 1.4.12. */
+:root[data-spacing='amplio'] body {
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  word-spacing: 0.16em;
+}
+
+:root[data-spacing='amplio'] p,
+:root[data-spacing='amplio'] li {
+  margin-bottom: 0.4em;
+}
+
+/* Tipografía de alta legibilidad (Braille Institute) en toda la interfaz, incluidos los titulares. */
+:root[data-font='legible'] {
+  --font-sans: 'Atkinson Hyperlegible Next Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Atkinson Hyperlegible Next Variable', ui-sans-serif, system-ui, sans-serif;
+}
+
+:root[data-font='legible'] .display,
+:root[data-font='legible'] .headline,
+:root[data-font='legible'] h1,
+:root[data-font='legible'] h2,
+:root[data-font='legible'] h3 {
+  letter-spacing: -0.01em;
+}
+
+:root[data-links='subrayados'] a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+:root[data-motion='reducido'] *,
+:root[data-motion='reducido'] *::before,
+:root[data-motion='reducido'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }

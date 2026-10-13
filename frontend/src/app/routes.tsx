@@ -40,6 +40,11 @@ export const routes: RouteObject[] = [
               { path: 'entrar', ...lazyPage(async () => ({ Component: (await import('../features/auth/LoginPage')).LoginPage })) },
               { path: 'registro', ...lazyPage(async () => ({ Component: (await import('../features/auth/RegisterPage')).RegisterPage })) },
               { path: 'privacidad', ...lazyPage(async () => ({ Component: (await import('../features/legal/PrivacyPage')).PrivacyPage })) },
+              {
+                path: 'accesibilidad',
+                ...lazyPage(async () => ({ Component: (await import('../features/legal/AccessibilityPage')).AccessibilityPage })),
+              },
+              { path: 'herramientas', ...lazyPage(async () => ({ Component: (await import('../features/tools/ToolboxPage')).ToolboxPage })) },
               { path: '*', element: <NotFoundPage /> },
             ],
           },

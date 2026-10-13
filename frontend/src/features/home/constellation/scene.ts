@@ -117,14 +117,15 @@ export function createConstellationScene(
   group.add(
     edges(data, data.technologyEdges, (_, tech) => (data.nodes[tech]!.microsoft ? COLORS.techEdge : COLORS.neutralEdge), 0.22),
   )
-  group.add(pointCloud(data, 'course', 0.13, texture))
-  group.add(pointCloud(data, 'technology', 0.3, texture))
+  group.add(pointCloud(data, 'course', 0.1, texture))
+  group.add(pointCloud(data, 'technology', 0.22, texture))
   scene.add(group)
 
   // Campo de estrellas tenue, que gira más despacio y da profundidad.
   const starPositions: number[] = []
   for (let i = 0; i < 420; i++) {
-    const r = 3 + Math.random() * 4
+    // Lejos de la cámara (z = 3,9) para que ninguna estrella se vea enorme.
+    const r = 6 + Math.random() * 5
     const theta = Math.random() * Math.PI * 2
     const phi = Math.acos(2 * Math.random() - 1)
     starPositions.push(r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta))
@@ -133,7 +134,15 @@ export function createConstellationScene(
   starGeometry.setAttribute('position', new Float32BufferAttribute(starPositions, 3))
   const stars = new Points(
     starGeometry,
-    new PointsMaterial({ size: 0.035, color: new Color('#9fb3cc'), transparent: true, opacity: 0.55, depthWrite: false }),
+    new PointsMaterial({
+      size: 0.09,
+      map: texture,
+      color: new Color('#9fb3cc'),
+      transparent: true,
+      opacity: 0.6,
+      depthWrite: false,
+      blending: AdditiveBlending,
+    }),
   )
   scene.add(stars)
 

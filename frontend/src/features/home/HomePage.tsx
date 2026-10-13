@@ -1,5 +1,10 @@
 import {
   BookOpenCheck,
+  Ear,
+  Keyboard,
+  MessageSquareText,
+  Type,
+  Volume2,
   Brain,
   Code2,
   GraduationCap,
@@ -24,6 +29,7 @@ import { Architecture } from './Architecture'
 import { Constellation } from './constellation/Constellation'
 import { HelloEditor } from './HelloEditor'
 import { MicrosoftStack } from './MicrosoftStack'
+import { NordicLandscape } from './NordicLandscape'
 
 /** Curso que se presenta en la portada. */
 const FEATURED_COURSE = 'programar-desde-cero-con-csharp'
@@ -60,6 +66,57 @@ const principles = [
   },
 ] as const
 
+const steps = [
+  {
+    title: 'Elige por dónde empezar',
+    text: 'Si nunca has programado, empieza por «Programar desde cero con C#». Si ya sabes algo, explora el catálogo.',
+  },
+  {
+    title: 'Aprende a tu manera',
+    text: 'Lee o escucha cada lección, haz la actividad práctica y comprueba lo aprendido. No hay prisa ni exámenes sorpresa.',
+  },
+  {
+    title: 'Guarda tu progreso',
+    text: 'Con una cuenta gratuita, la plataforma recuerda dónde lo dejaste. Es opcional: puedes leer sin registrarte.',
+  },
+] as const
+
+const inclusion = [
+  { Icon: Ear, title: 'Sin necesidad de oír', text: 'Todo es texto, y los videos llevan transcripción completa.' },
+  { Icon: MessageSquareText, title: 'Sin necesidad de hablar', text: 'Nada pide micrófono; en las sesiones en vivo participas por chat.' },
+  { Icon: Volume2, title: 'Escucha las lecciones', text: 'Lectura en voz alta con un botón, a la velocidad que prefieras.' },
+  { Icon: Type, title: 'Lee con comodidad', text: 'Texto más grande, más espacio y una tipografía de alta legibilidad.' },
+  { Icon: Keyboard, title: 'Con teclado o lector de pantalla', text: 'Navegación completa por teclado y compatible con lectores de pantalla.' },
+  { Icon: Wifi, title: 'Con cualquier conexión', text: 'Páginas ligeras y la opción de programar desde el navegador.' },
+] as const
+
+const faq = [
+  {
+    q: '¿De verdad es gratis?',
+    a: 'Sí. Los cursos, las lecciones y los ejercicios son gratuitos y lo seguirán siendo. El código de la plataforma es abierto: cualquiera puede comprobarlo.',
+  },
+  {
+    q: '¿Necesito saber matemáticas o inglés?',
+    a: 'No para empezar. Basta con las operaciones básicas, y todo está en español. Las pocas palabras en inglés que usa C#, como «WriteLine», se explican en las lecciones.',
+  },
+  {
+    q: '¿Necesito una computadora potente?',
+    a: 'No. Cualquier computadora sencilla sirve, y si no puedes instalar programas, puedes programar desde el navegador con GitHub Codespaces. Las lecciones también se pueden leer en el teléfono.',
+  },
+  {
+    q: '¿Y si me atasco?',
+    a: 'Es parte de aprender. Cada curso enseña a leer los errores y a buscar ayuda. Además, habrá ediciones guiadas con sesiones en vivo y estamos preparando un espacio de preguntas por curso.',
+  },
+  {
+    q: '¿Tengo alguna discapacidad, puedo aprender aquí?',
+    a: 'Sí, y queremos que te resulte cómodo. Puedes ajustar el texto, escuchar las lecciones y usar lector de pantalla. Si encuentras una barrera, cuéntanoslo y la arreglaremos.',
+  },
+  {
+    q: '¿Me darán un título?',
+    a: 'No. Kunnskap no es una universidad ni una institución acreditada. Lo que te llevas son habilidades reales y proyectos que puedes mostrar a quien quieras.',
+  },
+] as const
+
 const audience = [
   'Personas que nunca han programado y quieren empezar desde cero.',
   'Jóvenes que terminan el bachillerato y no pueden acceder a la universidad.',
@@ -82,19 +139,23 @@ export function HomePage() {
 
   return (
     <>
-      <section aria-labelledby="hero-title" className="stage overflow-hidden">
-        <Container className="grid items-center gap-10 pt-14 pb-16 sm:pt-20 lg:grid-cols-[1fr_1.1fr] lg:gap-6 lg:pb-24">
+      <section aria-labelledby="hero-title" className="stage relative overflow-hidden">
+        <Container className="relative z-10 grid items-center gap-10 pt-14 pb-28 sm:pt-20 sm:pb-40 lg:grid-cols-[1fr_1.1fr] lg:gap-6">
           <div className="space-y-7">
-            <p className="inline-flex items-center gap-2.5 rounded-full border border-stage-border bg-stage-raised/60 py-1 pr-3.5 pl-1.5 text-sm text-stage-muted">
-              <img src={dotnetLogo} alt="" width={24} height={24} className="size-6 rounded-full" />
-              Hecho con .NET 10 y código abierto
-            </p>
+            <div className="space-y-1">
+              <p lang="no" className="font-display text-3xl font-semibold tracking-[-0.02em] text-stage-accent">
+                Velkommen.
+              </p>
+              <p className="text-sm text-stage-muted">
+                Así se da la bienvenida en noruego. Nuestro nombre, Kunnskap, significa «conocimiento».
+              </p>
+            </div>
             <h1 id="hero-title" className="display">
-              Aprende a programar con C# y .NET. Gratis y desde cero.
+              Programar también es para ti.
             </h1>
             <p className="lead max-w-xl text-stage-muted">
-              Cursos en español de programación, desarrollo web, backend, inteligencia artificial y ciberseguridad, para
-              quien nunca ha programado y no puede pagar una formación.
+              Aprende C# y .NET, la tecnología de Microsoft, y también desarrollo web, inteligencia artificial y
+              ciberseguridad. Gratis, en español, a tu ritmo y con ayuda cuando la necesites.
             </p>
             <div className="flex flex-wrap gap-3">
               <ButtonLink to={`/cursos/${FEATURED_COURSE}`} variant="stage" size="lg">
@@ -104,15 +165,44 @@ export function HomePage() {
                 Ver todos los cursos
               </ButtonLink>
             </div>
-            <p className="text-sm text-stage-muted">
-              Gira la constelación: cada punto es un curso y cada etiqueta, una tecnología del catálogo.
+            <p className="inline-flex items-center gap-2.5 rounded-full border border-stage-border bg-stage-raised/60 py-1 pr-3.5 pl-1.5 text-sm text-stage-muted">
+              <img src={dotnetLogo} alt="" width={24} height={24} className="size-6 rounded-full" />
+              Hecho con .NET 10 y código abierto
             </p>
           </div>
-          <Constellation />
+          <div className="space-y-3">
+            <Constellation />
+            <p className="text-center text-sm text-stage-muted">
+              Gira la constelación: cada punto es un curso y cada etiqueta, una tecnología.
+            </p>
+          </div>
+        </Container>
+        <NordicLandscape />
+      </section>
+
+      <section aria-labelledby="steps-title" className="py-20 sm:py-28">
+        <Container>
+          <h2 id="steps-title" className="headline max-w-2xl">
+            Empieza en tres pasos. Sin prisa y sin miedo.
+          </h2>
+          <ol className="mt-12 grid gap-10 md:grid-cols-3">
+            {steps.map((step, i) => (
+              <li key={step.title} className="space-y-3">
+                <span
+                  aria-hidden="true"
+                  className="inline-flex size-11 items-center justify-center rounded-full bg-cloudberry font-display text-lg font-semibold text-stage"
+                >
+                  {i + 1}
+                </span>
+                <h3 className="text-xl font-semibold tracking-[-0.02em]">{step.title}</h3>
+                <p className="text-fg-muted">{step.text}</p>
+              </li>
+            ))}
+          </ol>
         </Container>
       </section>
 
-      <section aria-labelledby="try-title" className="py-20 sm:py-28">
+      <section aria-labelledby="try-title" className="bg-band py-20 sm:py-28">
         <Container className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
           <div className="space-y-5">
             <h2 id="try-title" className="headline">
@@ -135,6 +225,38 @@ export function HomePage() {
             </dl>
           </div>
           <HelloEditor />
+        </Container>
+      </section>
+
+      <section aria-labelledby="inclusion-title" className="py-20 sm:py-28">
+        <Container className="grid gap-12 lg:grid-cols-[1fr_1.3fr] lg:gap-20">
+          <div className="space-y-5">
+            <h2 id="inclusion-title" className="headline">
+              Aprender sin barreras.
+            </h2>
+            <p className="lead text-fg-muted">
+              Aquí nadie se queda fuera. Ajusta la web a tu manera y aprende como mejor te funcione: leyendo, escuchando o a
+              tu ritmo.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <ButtonLink to="/accesibilidad" variant="secondary" size="lg">
+                Accesibilidad e inclusión
+              </ButtonLink>
+            </div>
+          </div>
+          <ul className="grid gap-x-8 gap-y-8 sm:grid-cols-2">
+            {inclusion.map(({ Icon, title, text }) => (
+              <li key={title} className="space-y-2">
+                <p className="flex items-center gap-2.5 font-semibold">
+                  <span className="inline-flex size-9 items-center justify-center rounded-full bg-accent-soft text-accent-soft-fg">
+                    <Icon aria-hidden="true" className="size-[1.125rem]" />
+                  </span>
+                  {title}
+                </p>
+                <p className="text-[0.9375rem] text-fg-muted">{text}</p>
+              </li>
+            ))}
+          </ul>
         </Container>
       </section>
 
@@ -162,6 +284,33 @@ export function HomePage() {
           </div>
           <div className="mt-12">
             <SchoolList />
+          </div>
+        </Container>
+      </section>
+
+      <section aria-labelledby="faq-title" className="py-20 sm:py-28">
+        <Container className="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
+          <div className="space-y-4">
+            <h2 id="faq-title" className="headline">
+              Preguntas que todos nos hacemos
+            </h2>
+            <p className="lead text-fg-muted">Si tienes dudas antes de empezar, es normal. Estas son las más frecuentes.</p>
+          </div>
+          <div className="divide-y divide-border border-y border-border">
+            {faq.map((item) => (
+              <details key={item.q} className="group py-1">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-lg font-semibold tracking-[-0.01em] [&::-webkit-details-marker]:hidden">
+                  {item.q}
+                  <span
+                    aria-hidden="true"
+                    className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-muted text-xl leading-none transition-transform group-open:rotate-45"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="pb-5 text-fg-muted">{item.a}</p>
+              </details>
+            ))}
           </div>
         </Container>
       </section>

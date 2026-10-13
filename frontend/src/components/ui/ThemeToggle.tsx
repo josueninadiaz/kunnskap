@@ -1,6 +1,6 @@
 import { Monitor, Moon, Sun } from 'lucide-react'
-import { useId, useState } from 'react'
-import { applyThemePreference, readThemePreference, type ThemePreference } from '../../lib/theme'
+import { useId, useSyncExternalStore } from 'react'
+import { getThemeSnapshot, setThemePreference, subscribeTheme, type ThemePreference } from '../../lib/theme'
 
 const options: { value: ThemePreference; label: string; Icon: typeof Sun }[] = [
   { value: 'light', label: 'Tema claro', Icon: Sun },
@@ -13,13 +13,8 @@ const options: { value: ThemePreference; label: string; Icon: typeof Sun }[] = [
  * el teclado (flechas) y los lectores de pantalla funcionan sin código adicional.
  */
 export function ThemeToggle() {
-  const [preference, setPreference] = useState<ThemePreference>(readThemePreference)
+  const preference = useSyncExternalStore(subscribeTheme, getThemeSnapshot)
   const name = useId()
-
-  function choose(value: ThemePreference) {
-    setPreference(value)
-    applyThemePreference(value)
-  }
 
   return (
     <fieldset className="inline-flex rounded-full border border-border bg-surface-muted p-0.5">
@@ -31,7 +26,7 @@ export function ThemeToggle() {
             name={name}
             value={value}
             checked={preference === value}
-            onChange={() => choose(value)}
+            onChange={() => setThemePreference(value)}
             className="peer sr-only"
           />
           <span className="sr-only">{label}</span>

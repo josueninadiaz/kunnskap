@@ -9,6 +9,7 @@ import { describeError } from '../../lib/api'
 import { useCurrentUser } from '../auth/authApi'
 import { type CourseDetail, type LessonView, useCourse, useLesson } from '../catalog/catalogApi'
 import { useCourseProgress, useRecordVisit, useSetLessonCompletion } from './learningApi'
+import { ListenButton } from './ListenButton'
 
 export function LessonPage() {
   const { slug = '', lessonSlug = '' } = useParams()
@@ -51,6 +52,7 @@ function LessonContent({ lesson }: { lesson: LessonView }) {
   const enrolled = progress.data?.enrolled === true
   const recordVisit = useRecordVisit(lesson.courseSlug)
   const visited = useRef(false)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   // Guarda esta lección como punto desde el que continuar (una vez por lección).
   useEffect(() => {
@@ -98,7 +100,11 @@ function LessonContent({ lesson }: { lesson: LessonView }) {
         </span>
       </p>
 
-      <div className="space-y-10 text-[1.0625rem] leading-[1.7]">
+      <div className="mb-8">
+        <ListenButton target={contentRef} intro={lesson.title} />
+      </div>
+
+      <div ref={contentRef} className="space-y-10 text-[1.0625rem] leading-[1.7]">
         {lesson.videoUrl ? (
           <section className="space-y-3 rounded-(--radius-panel) border border-border bg-surface p-4">
             <p>
@@ -135,9 +141,11 @@ function LessonContent({ lesson }: { lesson: LessonView }) {
           <Markdown>{lesson.checkCriteriaMarkdown}</Markdown>
         </section>
 
-        <CompletionControl lesson={lesson} enrolled={enrolled} signedIn={Boolean(user.data)} />
+        <div data-no-speech>
+          <CompletionControl lesson={lesson} enrolled={enrolled} signedIn={Boolean(user.data)} />
+        </div>
 
-        <nav aria-label="Lecciones" className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:justify-between">
+        <nav data-no-speech aria-label="Lecciones" className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:justify-between">
           {lesson.previous ? (
             <Link to={lessonUrl(lesson.previous.slug)} className="group inline-flex items-start gap-2 text-sm">
               <ChevronLeft aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
