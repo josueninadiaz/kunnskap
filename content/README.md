@@ -61,4 +61,27 @@ Explicación con ejemplos…
 - Todo el código de ejemplo debe haberse ejecutado. Cuando muestres una salida o un mensaje de error, copia el real.
 - Enlaza documentación oficial en una sección «Referencias» al final de la explicación.
 
+## Cuestionarios
+
+Cada módulo puede indicar `quiz: <archivo>.yml` (relativo a la carpeta del curso):
+
+```yaml
+slug: cuestionario-tu-primer-programa      # único en toda la plataforma
+title: Comprueba lo que aprendiste en el módulo 1
+passingScore: 70                           # porcentaje para aprobar
+questions:
+  - id: sdk-o-runtime                      # clave estable: no la cambies o se pierde el historial
+    type: single                           # single, multiple o short
+    prompt: ¿Qué tienes que instalar…?
+    options:
+      - { text: El SDK de .NET., correct: true }
+      - { text: Solo el Runtime de .NET. }
+    explanation: Se muestra al acertar y, al aprobar, en todas las preguntas.
+    hint: Se muestra al fallar. Orienta sin dar la respuesta.
+    lesson: prepara-tu-entorno             # lección para repasar
+```
+
+- `single`: al menos 2 opciones y exactamente 1 correcta. `multiple`: se acierta marcando exactamente las correctas. `short`: lista `answers`; se compara sin distinguir mayúsculas, tildes ni espacios sobrantes. Úsala solo cuando la respuesta sea inequívoca (un comando, un código de error).
+- Las respuestas correctas nunca llegan al navegador antes de aprobar.
+
 Un curso solo puede pasar a `Published` si tiene objetivos, fecha de revisión **humana** (`lastReviewedAt`) y al menos un módulo con lecciones. Puede publicarse con módulos aún sin lecciones: el temario los mostrará «en preparación».

@@ -32,7 +32,9 @@ internal sealed record PagedResponse<T>(IReadOnlyList<T> Items, int Page, int Pa
 
 internal sealed record LessonOutline(string Slug, string Title, int EstimatedMinutes);
 
-internal sealed record ModuleOutline(string Title, string Summary, IReadOnlyList<LessonOutline> Lessons);
+internal sealed record QuizOutline(string Slug, string Title, int QuestionCount);
+
+internal sealed record ModuleOutline(string Title, string Summary, IReadOnlyList<LessonOutline> Lessons, QuizOutline? Quiz);
 
 internal sealed record CourseDetail(
     string Slug,
@@ -251,7 +253,11 @@ internal static class CatalogEndpoints
                     .Select(m => new ModuleOutline(
                         m.Title,
                         m.Summary,
-                        m.Lessons.OrderBy(l => l.SortOrder).Select(l => new LessonOutline(l.Slug, l.Title, l.EstimatedMinutes)).ToList()))
+                        m.Lessons.OrderBy(l => l.SortOrder).Select(l => new LessonOutline(l.Slug, l.Title, l.EstimatedMinutes)).ToList(),
+                        db.Quizzes
+                            .Where(q => q.ModuleId == m.Id)
+                            .Select(q => new QuizOutline(q.Slug, q.Title, q.Questions.Count))
+                            .FirstOrDefault()))
                     .ToList(),
                 c.Modules.Count > 0 && c.Modules.All(m => m.Lessons.Count > 0)))
             .SingleOrDefaultAsync(ct);

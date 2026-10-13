@@ -32,8 +32,9 @@ const course: CourseDetail = {
         { slug: 'que-es-programar', title: '¿Qué es programar?', estimatedMinutes: 15 },
         { slug: 'tu-primer-programa', title: 'Tu primer programa', estimatedMinutes: 20 },
       ],
+      quiz: null,
     },
-    { title: 'Datos y operaciones', summary: '', lessons: [] },
+    { title: 'Datos y operaciones', summary: '', lessons: [], quiz: null },
   ],
   contentComplete: false,
 }
@@ -64,6 +65,8 @@ const progress = (overrides: Partial<CourseProgress> = {}): CourseProgress => ({
   lastLessonSlug: null,
   completedLessonSlugs: [],
   totalLessons: 2,
+  passedQuizSlugs: [],
+  totalQuizzes: 0,
   ...overrides,
 })
 

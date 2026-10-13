@@ -8,6 +8,8 @@ export interface CourseProgress {
   lastLessonSlug: string | null
   completedLessonSlugs: string[]
   totalLessons: number
+  passedQuizSlugs: string[]
+  totalQuizzes: number
 }
 
 const progressKey = (courseSlug: string) => ['learning', 'progress', courseSlug] as const

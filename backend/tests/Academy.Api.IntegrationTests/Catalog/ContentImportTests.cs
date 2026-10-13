@@ -245,6 +245,89 @@ public sealed class ContentImportTests(PostgresFixture postgres) : IDisposable
         Assert.Contains(ex.Errors, e => e.StartsWith("escuelas.yml (línea", StringComparison.Ordinal));
     }
 
+    private const string ValidQuiz = """
+        slug: SLUG
+        title: Cuestionario
+        questions:
+          - id: pregunta-uno
+            type: single
+            prompt: ¿Una?
+            options:
+              - { text: Sí, correct: true }
+              - { text: No }
+            explanation: EXPLICACION
+            lesson: a
+        """;
+
+    [Fact]
+    public async Task Invalid_quizzes_report_clear_errors()
+    {
+        var school = $"escuela-{Guid.NewGuid():N}";
+        var dir = TempContent($"- {{ slug: {school}, order: 1, name: Escuela, description: Descripción }}", "[]");
+        WriteFile(dir, $"cursos/{school}/curso/curso.yml", CourseYaml(school, $"curso-{Guid.NewGuid():N}", "InDevelopment", "  - { title: Uno, summary: '', lessons: m1, quiz: m1/q.yml }"));
+        WriteFile(dir, $"cursos/{school}/curso/m1/01-a.md", LessonFile("a"));
+        WriteFile(dir, $"cursos/{school}/curso/m1/q.yml", """
+            slug: cuestionario-malo
+            title: Malo
+            questions:
+              - id: dos-correctas
+                type: single
+                prompt: ¿?
+                options:
+                  - { text: A, correct: true }
+                  - { text: B, correct: true }
+                explanation: X
+              - id: corta-sin-respuestas
+                type: short
+                prompt: ¿?
+                explanation: X
+                lesson: no-existe
+            """);
+
+        var ex = await Assert.ThrowsAsync<ContentValidationException>(() => ImportAsync(dir));
+
+        Assert.Contains(ex.Errors, e => e.Contains("exactamente 1 correcta", StringComparison.Ordinal));
+        Assert.Contains(ex.Errors, e => e.Contains("short necesita answers", StringComparison.Ordinal));
+        Assert.Contains(ex.Errors, e => e.Contains("lección «no-existe»", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task Reimporting_a_quiz_keeps_the_attempt_history()
+    {
+        var school = $"escuela-{Guid.NewGuid():N}";
+        var quizSlug = $"cuestionario-{Guid.NewGuid():N}";
+        var dir = TempContent($"- {{ slug: {school}, order: 1, name: Escuela, description: Descripción }}", "[]");
+        WriteFile(dir, $"cursos/{school}/curso/curso.yml", CourseYaml(school, $"curso-{Guid.NewGuid():N}", "InDevelopment", "  - { title: Uno, summary: '', lessons: m1, quiz: m1/q.yml }"));
+        WriteFile(dir, $"cursos/{school}/curso/m1/01-a.md", LessonFile("a"));
+        WriteFile(dir, $"cursos/{school}/curso/m1/q.yml", ValidQuiz.Replace("SLUG", quizSlug, StringComparison.Ordinal));
+        await ImportAsync(dir);
+
+        Guid attemptId;
+        await using (var scope = _factory.Services.CreateAsyncScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AcademyDbContext>();
+            var user = new Academy.Api.Modules.Identity.User { UserName = $"{Guid.NewGuid():N}@example.org", Email = $"{Guid.NewGuid():N}@example.org" };
+            db.Users.Add(user);
+            var quiz = await db.Quizzes.Include(q => q.Questions).SingleAsync(q => q.Slug == quizSlug, Ct);
+            var attempt = new Academy.Api.Modules.Assessments.QuizAttempt { UserId = user.Id, QuizId = quiz.Id, SubmittedAt = DateTimeOffset.UtcNow, ScorePercent = 100, Passed = true };
+            attempt.Answers.Add(new Academy.Api.Modules.Assessments.AttemptAnswer { QuestionId = quiz.Questions[0].Id, IsCorrect = true, PointsAwarded = 1 });
+            db.QuizAttempts.Add(attempt);
+            await db.SaveChangesAsync(Ct);
+            attemptId = attempt.Id;
+        }
+
+        // Se corrige el texto de la explicación y se reimporta.
+        WriteFile(dir, $"cursos/{school}/curso/m1/q.yml", ValidQuiz.Replace("SLUG", quizSlug, StringComparison.Ordinal).Replace("EXPLICACION", "Explicación mejorada", StringComparison.Ordinal));
+        await ImportAsync(dir);
+
+        await using var check = _factory.Services.CreateAsyncScope();
+        var checkDb = check.ServiceProvider.GetRequiredService<AcademyDbContext>();
+        Assert.True(await checkDb.QuizAttempts.AnyAsync(a => a.Id == attemptId, Ct));
+        Assert.Equal(1, await checkDb.Set<Academy.Api.Modules.Assessments.AttemptAnswer>().CountAsync(a => a.AttemptId == attemptId, Ct));
+        var question = await checkDb.Questions.SingleAsync(q => q.Quiz!.Slug == quizSlug, Ct);
+        Assert.Equal("Explicación mejorada", question.ExplanationMarkdown);
+    }
+
     public void Dispose()
     {
         _factory.Dispose();

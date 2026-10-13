@@ -3,6 +3,7 @@ using Academy.Api.Common.Errors;
 using Academy.Api.Common.Platform;
 using Academy.Api.Common.Security;
 using Academy.Api.Infrastructure.Persistence;
+using Academy.Api.Modules.Assessments;
 using Academy.Api.Modules.Catalog;
 using Academy.Api.Modules.Identity;
 using Academy.Api.Modules.Learning;
@@ -76,6 +77,7 @@ api.MapPlatformEndpoints();
 api.MapAuthEndpoints();
 api.MapCatalogEndpoints();
 api.MapLearningEndpoints();
+api.MapQuizEndpoints();
 api.MapUserAdminEndpoints();
 
 await app.RunAsync();

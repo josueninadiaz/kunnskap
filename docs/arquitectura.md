@@ -50,6 +50,13 @@ Cada módulo contiene su dominio (`Domain/`), su configuración de EF (`Persiste
 - Un curso se da por completado cuando lo están todas sus lecciones publicadas. Si se publican lecciones nuevas, vuelve a quedar abierto. Las evaluaciones se sumarán a esta regla.
 - Las entidades nuevas con `Guid` generado en el cliente se registran con `Add` explícito: si solo se añaden a una colección de una entidad ya existente, EF Core supone que existen y hace un `UPDATE` (ver `ContentImporter`).
 
+## Evaluaciones
+
+- `Modules/Assessments`: `Quiz` (uno por módulo), `Question` (con clave estable `Key`), `QuestionOption`, `QuizAttempt` y `AttemptAnswer`. El contenido se define en `content/` y el importador conserva los intentos al reimportar.
+- El cuestionario público nunca incluye `IsCorrect`, las respuestas aceptadas, las explicaciones ni las pistas (verificado por pruebas). El servidor corrige cada intento.
+- Retroalimentación: explicación en lo acertado; pista y lección para repasar en lo fallado; respuestas correctas y todas las explicaciones solo al aprobar.
+- Un curso se completa con todas las lecciones completadas y todos los cuestionarios aprobados (`LearningCompletion`).
+
 ## Seguridad (resumen)
 
 - La autenticación usa ASP.NET Core Identity con la cookie `kunnskap_session` (HttpOnly, `SameSite=Strict` y `Secure` fuera de desarrollo). Los endpoints están en `/api/auth/*`.

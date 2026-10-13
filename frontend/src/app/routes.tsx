@@ -32,6 +32,10 @@ export const routes: RouteObject[] = [
             children: [
               { path: 'cursos', ...lazyPage(async () => ({ Component: (await import('../features/catalog/CatalogPage')).CatalogPage })) },
               {
+                path: 'cursos/:slug/cuestionarios/:quizSlug',
+                ...lazyPage(async () => ({ Component: (await import('../features/assessments/QuizPage')).QuizPage })),
+              },
+              {
                 path: 'cursos/:slug/lecciones/:lessonSlug',
                 ...lazyPage(async () => ({ Component: (await import('../features/learning/LessonPage')).LessonPage })),
               },

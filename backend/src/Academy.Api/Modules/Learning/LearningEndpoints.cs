@@ -13,7 +13,9 @@ internal sealed record CourseProgressResponse(
     DateTimeOffset? CompletedAt,
     string? LastLessonSlug,
     IReadOnlyList<string> CompletedLessonSlugs,
-    int TotalLessons);
+    int TotalLessons,
+    IReadOnlyList<string> PassedQuizSlugs,
+    int TotalQuizzes);
 
 /// <summary>
 /// Inscripción gratuita y progreso. Leer las lecciones es público; inscribirse sirve para guardar
@@ -74,10 +76,11 @@ internal static class LearningEndpoints
             .SingleOrDefaultAsync(ct);
 
         var totalLessons = await db.Lessons.CountAsync(l => l.Module!.CourseId == courseId, ct);
+        var totalQuizzes = await db.Quizzes.CountAsync(q => q.Module!.CourseId == courseId, ct);
 
         if (enrollment is null)
         {
-            return new CourseProgressResponse(false, null, null, null, [], totalLessons);
+            return new CourseProgressResponse(false, null, null, null, [], totalLessons, [], totalQuizzes);
         }
 
         var completed = await db.LessonProgress
@@ -88,7 +91,15 @@ internal static class LearningEndpoints
             .Select(p => p.Lesson!.Slug)
             .ToListAsync(ct);
 
-        return new CourseProgressResponse(true, enrollment.EnrolledAt, enrollment.CompletedAt, enrollment.LastLessonSlug, completed, totalLessons);
+        var passedQuizzes = await db.QuizAttempts
+            .AsNoTracking()
+            .Where(a => a.UserId == userId && a.Passed && a.Quiz!.Module!.CourseId == courseId)
+            .Select(a => a.Quiz!.Slug)
+            .Distinct()
+            .ToListAsync(ct);
+
+        return new CourseProgressResponse(
+            true, enrollment.EnrolledAt, enrollment.CompletedAt, enrollment.LastLessonSlug, completed, totalLessons, passedQuizzes, totalQuizzes);
     }
 
     private static async Task<Results<Ok<CourseProgressResponse>, NotFound, ProblemHttpResult>> EnrollAsync(
@@ -196,24 +207,9 @@ internal static class LearningEndpoints
         target.Enrollment.LastActivityAt = now;
         await SaveIgnoringDuplicateProgressAsync(db, ct);
 
-        await UpdateCourseCompletionAsync(target, userId, now, db, ct);
+        await LearningCompletion.UpdateAsync(db, target.CourseId, userId, now, ct);
 
         return TypedResults.Ok(await BuildProgressAsync(target.CourseId, userId, db, ct));
-    }
-
-    /// <summary>
-    /// El curso está completado cuando lo están todas sus lecciones publicadas. Si se publican lecciones
-    /// nuevas, deja de estarlo hasta completarlas. (Las evaluaciones se sumarán a esta regla).
-    /// </summary>
-    private static async Task UpdateCourseCompletionAsync(LessonTarget target, Guid userId, DateTimeOffset now, AcademyDbContext db, CancellationToken ct)
-    {
-        var total = await db.Lessons.CountAsync(l => l.Module!.CourseId == target.CourseId, ct);
-        var done = await db.LessonProgress.CountAsync(
-            p => p.UserId == userId && p.CompletedAt != null && p.Lesson!.Module!.CourseId == target.CourseId, ct);
-
-        var enrollment = target.Enrollment!;
-        enrollment.CompletedAt = total > 0 && done == total ? enrollment.CompletedAt ?? now : null;
-        await db.SaveChangesAsync(ct);
     }
 
     private static async Task<LessonProgress> GetOrCreateProgressAsync(Guid userId, Guid lessonId, DateTimeOffset now, AcademyDbContext db, CancellationToken ct)

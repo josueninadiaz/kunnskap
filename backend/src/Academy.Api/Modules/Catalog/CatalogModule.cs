@@ -54,7 +54,7 @@ internal static class ContentCommands
         {
             var result = await importer.ImportAsync(services.ResolveContentPath());
             await Console.Out.WriteLineAsync(
-                $"Importado: {result.Schools} escuelas, {result.Technologies} tecnologías, {result.Courses} cursos, {result.Lessons} lecciones.");
+                $"Importado: {result.Schools} escuelas, {result.Technologies} tecnologías, {result.Courses} cursos, {result.Lessons} lecciones, {result.Quizzes} cuestionarios.");
             return 0;
         }
         catch (ContentValidationException ex)

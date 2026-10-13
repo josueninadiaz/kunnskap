@@ -88,13 +88,18 @@ export function EnrollmentPanel({ courseSlug, lessonSlugs }: EnrollmentPanelProp
       {data.completedAt ? (
         <p className="flex items-center gap-2 font-medium">
           <CheckCircle2 aria-hidden="true" className="size-5 text-success" />
-          Completaste todas las lecciones publicadas.
+          Completaste el curso: todas las lecciones y cuestionarios publicados.
         </p>
       ) : null}
       <div className="space-y-2">
         <label htmlFor="progreso-curso" className="block text-sm font-medium">
           {completed} de {data.totalLessons} lecciones completadas
         </label>
+        {data.totalQuizzes > 0 ? (
+          <p className="text-sm text-fg-muted">
+            {data.passedQuizSlugs.length} de {data.totalQuizzes} {data.totalQuizzes === 1 ? 'cuestionario aprobado' : 'cuestionarios aprobados'}
+          </p>
+        ) : null}
         <progress
           id="progreso-curso"
           max={data.totalLessons}

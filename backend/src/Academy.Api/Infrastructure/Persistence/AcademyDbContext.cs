@@ -1,3 +1,4 @@
+using Academy.Api.Modules.Assessments;
 using Academy.Api.Modules.Catalog.Domain;
 using Academy.Api.Modules.Identity;
 using Academy.Api.Modules.Learning;
@@ -27,6 +28,14 @@ internal sealed class AcademyDbContext(DbContextOptions<AcademyDbContext> option
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
 
     public DbSet<LessonProgress> LessonProgress => Set<LessonProgress>();
+
+    public DbSet<Quiz> Quizzes => Set<Quiz>();
+
+    public DbSet<Question> Questions => Set<Question>();
+
+    public DbSet<QuestionOption> QuestionOptions => Set<QuestionOption>();
+
+    public DbSet<QuizAttempt> QuizAttempts => Set<QuizAttempt>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -31,6 +31,7 @@ modules:
   - title: Tu primer programa
     summary: Qué es programar, cómo preparar el entorno (en tu equipo o en Codespaces) y ejecutar tu primer `dotnet run hola.cs`.
     lessons: modulo-01
+    quiz: modulo-01/cuestionario.yml
   - title: Datos y operaciones
     summary: Variables, tipos de datos, operadores, y leer y escribir en la consola.
   - title: Tomar decisiones

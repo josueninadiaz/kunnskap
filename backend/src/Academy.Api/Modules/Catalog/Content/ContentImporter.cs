@@ -19,10 +19,14 @@ internal sealed class ContentOptions
     public bool ImportOnStartup { get; init; }
 }
 
-internal sealed record ImportResult(int Schools, int Technologies, int Courses, int Lessons);
+internal sealed record ImportResult(int Schools, int Technologies, int Courses, int Lessons, int Quizzes);
 
 /// <summary>Curso leído de content/ con las lecciones de cada módulo (misma posición que <c>Doc.Modules</c>).</summary>
-internal sealed record CourseSource(string Path, CourseDocument Doc, List<List<LessonDocument>> ModuleLessons);
+internal sealed record CourseSource(
+    string Path,
+    CourseDocument Doc,
+    List<List<LessonDocument>> ModuleLessons,
+    List<QuizDocument?> ModuleQuizzes);
 
 /// <summary>Errores de contenido, todos a la vez, para corregirlos en una sola pasada.</summary>
 internal sealed class ContentValidationException(IReadOnlyList<string> errors)
@@ -58,11 +62,16 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
             var relative = System.IO.Path.GetRelativePath(contentPath, file).Replace('\\', '/');
             if (Load<CourseDocument>(contentPath, relative, errors) is { } course)
             {
-                courses.Add(new CourseSource(relative, course, LoadLessons(contentPath, relative, course, errors)));
+                courses.Add(new CourseSource(
+                    relative,
+                    course,
+                    LoadLessons(contentPath, relative, course, errors),
+                    LoadQuizzes(contentPath, relative, course, errors)));
             }
         }
 
         Validate(schools, technologies, courses, errors);
+        ValidateQuizzes(courses, errors);
         if (errors.Count > 0)
         {
             throw new ContentValidationException(errors);
@@ -72,22 +81,23 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
 
         var schoolEntities = await UpsertSchoolsAsync(schools, cancellationToken);
         var technologyEntities = await UpsertTechnologiesAsync(technologies, cancellationToken);
-        var finalLessonOrder = await UpsertCoursesAsync(courses, schoolEntities, technologyEntities, cancellationToken);
+        var finalizers = await UpsertCoursesAsync(courses, schoolEntities, technologyEntities, cancellationToken);
 
         // Dos pasos: las lecciones se guardan primero con posiciones provisionales (negativas) para que
         // reordenar o mover lecciones entre módulos no choque con el índice único (módulo, posición).
         await db.SaveChangesAsync(cancellationToken);
-        foreach (var (lesson, order) in finalLessonOrder)
+        foreach (var finalize in finalizers)
         {
-            lesson.SortOrder = order;
+            finalize();
         }
 
         await db.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
         var lessonCount = courses.Sum(c => c.ModuleLessons.Sum(m => m.Count));
-        var result = new ImportResult(schools.Count, technologies.Count, courses.Count, lessonCount);
-        LogImported(logger, result.Schools, result.Technologies, result.Courses, result.Lessons);
+        var quizCount = courses.Sum(c => c.ModuleQuizzes.Count(q => q is not null));
+        var result = new ImportResult(schools.Count, technologies.Count, courses.Count, lessonCount, quizCount);
+        LogImported(logger, result.Schools, result.Technologies, result.Courses, result.Lessons, result.Quizzes);
         return result;
     }
 
@@ -194,7 +204,7 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
         var schoolSlugs = schools.Select(s => s.Slug).ToHashSet(StringComparer.Ordinal);
         var technologySlugs = technologies.Select(t => t.Slug).ToHashSet(StringComparer.Ordinal);
 
-        foreach (var (path, course, moduleLessons) in courses)
+        foreach (var (path, course, moduleLessons, _) in courses)
         {
             CheckSlug(path, course.Slug, errors);
             CheckText(path, "title", course.Title, 200, errors);
@@ -323,7 +333,8 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
         return existing;
     }
 
-    private async Task<List<(Lesson Lesson, int Order)>> UpsertCoursesAsync(
+    /// <summary>Devuelve acciones que fijan las posiciones definitivas tras el primer guardado.</summary>
+    private async Task<List<Action>> UpsertCoursesAsync(
         List<CourseSource> documents,
         Dictionary<string, School> schools,
         Dictionary<string, Technology> technologies,
@@ -337,9 +348,10 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
             .AsSplitQuery()
             .ToDictionaryAsync(c => c.Slug, StringComparer.Ordinal, ct);
 
-        var finalLessonOrder = new List<(Lesson, int)>();
+        var finalizers = new List<Action>();
+        var existingQuizzes = await LoadExistingQuizzesAsync(documents, ct);
 
-        foreach (var (path, doc, moduleLessons) in documents)
+        foreach (var (path, doc, moduleLessons, moduleQuizzes) in documents)
         {
             if (!existing.TryGetValue(doc.Slug, out var course))
             {
@@ -373,10 +385,11 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
             course.Technologies.Clear();
             course.Technologies.AddRange(doc.Technologies.Select(t => technologies[t]));
 
-            SyncModules(course, doc.Modules, moduleLessons, finalLessonOrder);
+            SyncModules(course, doc.Modules, moduleLessons, finalizers);
+            SyncQuizzes(course, moduleQuizzes, existingQuizzes, finalizers);
         }
 
-        return finalLessonOrder;
+        return finalizers;
     }
 
     /// <summary>
@@ -386,7 +399,7 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
         Course course,
         List<ModuleDocument> documents,
         List<List<LessonDocument>> moduleLessons,
-        List<(Lesson, int)> finalLessonOrder)
+        List<Action> finalizers)
     {
         var current = course.Modules.OrderBy(m => m.SortOrder).ToList();
         var existingLessons = current.SelectMany(m => m.Lessons).ToDictionary(l => l.Slug, StringComparer.Ordinal);
@@ -432,7 +445,9 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
                 lesson.VideoUrl = doc.Meta.VideoUrl is null ? null : new Uri(doc.Meta.VideoUrl);
                 lesson.TranscriptMarkdown = doc.Transcript;
                 lesson.SortOrder = --provisional;
-                finalLessonOrder.Add((lesson, j + 1));
+                var finalLesson = lesson;
+                var finalOrder = j + 1;
+                finalizers.Add(() => finalLesson.SortOrder = finalOrder);
                 keptLessons.Add(doc.Meta.Slug);
             }
         }
@@ -451,6 +466,6 @@ internal sealed partial class ContentImporter(AcademyDbContext db, TimeProvider 
     [GeneratedRegex("^[a-z0-9]+(-[a-z0-9]+)*$")]
     private static partial Regex SlugPattern();
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Contenido importado: {Schools} escuelas, {Technologies} tecnologías, {Courses} cursos, {Lessons} lecciones")]
-    private static partial void LogImported(ILogger logger, int schools, int technologies, int courses, int lessons);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Contenido importado: {Schools} escuelas, {Technologies} tecnologías, {Courses} cursos, {Lessons} lecciones, {Quizzes} cuestionarios")]
+    private static partial void LogImported(ILogger logger, int schools, int technologies, int courses, int lessons, int quizzes);
 }

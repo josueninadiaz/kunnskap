@@ -72,6 +72,7 @@ function CourseView({ course }: { course: CourseDetail }) {
   const published = course.status === 'Published'
   const progress = useCourseProgress(course.slug, published && Boolean(user.data))
   const completed = new Set(progress.data?.completedLessonSlugs ?? [])
+  const passedQuizzes = new Set(progress.data?.passedQuizSlugs ?? [])
   const lessonSlugs = course.modules.flatMap((m) => m.lessons.map((l) => l.slug))
   const lessonCount = lessonSlugs.length
   const author = course.authors[0]
@@ -224,6 +225,22 @@ function CourseView({ course }: { course: CourseDetail }) {
                               </li>
                             ))}
                           </ol>
+                        ) : null}
+                        {m.quiz && published ? (
+                          <p className="flex items-baseline justify-between gap-4 border-t border-border pt-3 text-[0.9375rem]">
+                            <span className="flex items-baseline gap-2">
+                              {passedQuizzes.has(m.quiz.slug) ? (
+                                <span className="inline-flex translate-y-0.5 text-success">
+                                  <CheckCircle2 aria-hidden="true" className="size-4" />
+                                  <span className="sr-only">Aprobado</span>
+                                </span>
+                              ) : null}
+                              <Link to={`/cursos/${course.slug}/cuestionarios/${m.quiz.slug}`} className="font-medium text-accent hover:underline">
+                                Cuestionario: {m.quiz.title}
+                              </Link>
+                            </span>
+                            <span className="shrink-0 text-sm text-fg-muted tabular-nums">{m.quiz.questionCount} preguntas</span>
+                          </p>
                         ) : null}
                       </div>
                     </details>

@@ -297,7 +297,7 @@ Las tablas de Identity (`users`, `roles`, `user_roles`, `user_claims`…) se gen
 3. ✅ Inscripción gratuita. *(2026-10-12)*
 4. ✅ Lección con Markdown seguro, pública y sin necesidad de cuenta, con navegación entre lecciones. *(2026-10-12)*
 5. ✅ Progreso, lecciones completadas y punto desde el que continuar. *(2026-10-12)*
-6. Cuestionario con intentos.
+6. ✅ Cuestionarios de módulo (opción única, múltiple y respuesta corta) con intentos registrados, historial y retroalimentación que no revela las respuestas hasta aprobar. *(2026-10-12)*
 7. Panel del estudiante.
 8. **Ediciones y sesiones en vivo:** crear una edición, unirse, ver el calendario en la zona horaria del alumno, enlace a Teams solo para miembros, grabación y transcripción.
 9. Administración del contenido.

@@ -127,7 +127,7 @@ const detail: CourseDetail = {
   softwareVersions: ['.NET 10'],
   lastReviewedAt: null,
   technologies: [{ slug: 'csharp', name: 'C#' }],
-  modules: [{ title: 'Tu primer programa', summary: 'Ejecutar `dotnet run hola.cs`.', lessons: [] }],
+  modules: [{ title: 'Tu primer programa', summary: 'Ejecutar `dotnet run hola.cs`.', lessons: [], quiz: null }],
   contentComplete: false,
 }
 

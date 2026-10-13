@@ -65,6 +65,9 @@ function LessonContent({ lesson }: { lesson: LessonView }) {
   const lessonUrl = (slug: string) => `/cursos/${lesson.courseSlug}/lecciones/${slug}`
   const course = useCourse(lesson.courseSlug)
   const completed = new Set(progress.data?.completedLessonSlugs ?? [])
+  // Al terminar la última lección de un módulo con cuestionario, lo siguiente es el cuestionario.
+  const currentModule = course.data?.modules.find((m) => m.lessons.some((l) => l.slug === lesson.slug))
+  const nextQuiz = currentModule?.quiz && currentModule.lessons.at(-1)?.slug === lesson.slug ? currentModule.quiz : null
 
   return (
     <div className="grid gap-10 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-16">
@@ -157,7 +160,15 @@ function LessonContent({ lesson }: { lesson: LessonView }) {
           ) : (
             <span />
           )}
-          {lesson.next ? (
+          {nextQuiz ? (
+            <Link to={`/cursos/${lesson.courseSlug}/cuestionarios/${nextQuiz.slug}`} className="group inline-flex items-start gap-2 text-sm sm:text-right">
+              <span>
+                <span className="block text-fg-muted">Siguiente: comprueba lo aprendido</span>
+                <span className="font-medium text-accent group-hover:underline">{nextQuiz.title}</span>
+              </span>
+              <ChevronRight aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+            </Link>
+          ) : lesson.next ? (
             <Link to={lessonUrl(lesson.next.slug)} className="group inline-flex items-start gap-2 text-sm sm:text-right">
               <span>
                 <span className="block text-fg-muted">Siguiente</span>
@@ -188,13 +199,13 @@ function CourseOutline({ course, currentSlug, completed }: { course: CourseDetai
         <li key={m.title}>
           <p className="eyebrow text-fg-muted">{m.title}</p>
           <ol className="mt-2 space-y-0.5">
-            {m.lessons.map((l) => {
+            {[...m.lessons.map((l) => ({ ...l, kind: 'lesson' as const })), ...(m.quiz ? [{ slug: m.quiz.slug, title: `Cuestionario: ${m.quiz.title}`, kind: 'quiz' as const }] : [])].map((l) => {
               const current = l.slug === currentSlug
               const done = completed.has(l.slug)
               return (
                 <li key={l.slug}>
                   <Link
-                    to={`/cursos/${course.slug}/lecciones/${l.slug}`}
+                    to={`/cursos/${course.slug}/${l.kind === 'quiz' ? 'cuestionarios' : 'lecciones'}/${l.slug}`}
                     aria-current={current ? 'page' : undefined}
                     className={`flex items-start gap-2.5 rounded-(--radius-control) px-2.5 py-2 text-[0.9375rem] leading-snug ${
                       current ? 'bg-accent-soft font-medium text-accent-soft-fg' : 'text-fg hover:bg-surface-muted'

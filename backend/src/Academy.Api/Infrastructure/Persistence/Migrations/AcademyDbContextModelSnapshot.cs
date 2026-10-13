@@ -24,6 +24,244 @@ namespace Academy.Api.Infrastructure.Persistence.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "unaccent");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.AttemptAnswer", b =>
+                {
+                    b.Property<Guid>("AttemptId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("attempt_id");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("question_id");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_correct");
+
+                    b.Property<int>("PointsAwarded")
+                        .HasColumnType("integer")
+                        .HasColumnName("points_awarded");
+
+                    b.PrimitiveCollection<List<Guid>>("SelectedOptionIds")
+                        .IsRequired()
+                        .HasColumnType("uuid[]")
+                        .HasColumnName("selected_option_ids");
+
+                    b.Property<string>("TextAnswer")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("text_answer");
+
+                    b.HasKey("AttemptId", "QuestionId")
+                        .HasName("pk_attempt_answers");
+
+                    b.HasIndex("QuestionId")
+                        .HasDatabaseName("ix_attempt_answers_question_id");
+
+                    b.ToTable("attempt_answers", (string)null);
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.Question", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.PrimitiveCollection<List<string>>("AcceptedAnswers")
+                        .IsRequired()
+                        .HasColumnType("text[]")
+                        .HasColumnName("accepted_answers");
+
+                    b.Property<string>("ExplanationMarkdown")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("explanation_markdown");
+
+                    b.Property<string>("HintMarkdown")
+                        .HasColumnType("text")
+                        .HasColumnName("hint_markdown");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("key");
+
+                    b.Property<string>("LessonSlug")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("lesson_slug");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("integer")
+                        .HasColumnName("points");
+
+                    b.Property<string>("PromptMarkdown")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("prompt_markdown");
+
+                    b.Property<Guid>("QuizId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("quiz_id");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_questions");
+
+                    b.HasIndex("QuizId", "Key")
+                        .IsUnique()
+                        .HasDatabaseName("ix_questions_quiz_id_key");
+
+                    b.HasIndex("QuizId", "SortOrder")
+                        .IsUnique()
+                        .HasDatabaseName("ix_questions_quiz_id_sort_order");
+
+                    b.ToTable("questions", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_questions_points", "points > 0");
+                        });
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.QuestionOption", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_correct");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("question_id");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.Property<string>("TextMarkdown")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("text_markdown");
+
+                    b.HasKey("Id")
+                        .HasName("pk_question_options");
+
+                    b.HasIndex("QuestionId", "SortOrder")
+                        .IsUnique()
+                        .HasDatabaseName("ix_question_options_question_id_sort_order");
+
+                    b.ToTable("question_options", (string)null);
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.Quiz", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("ModuleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("module_id");
+
+                    b.Property<int>("PassingScorePercent")
+                        .HasColumnType("integer")
+                        .HasColumnName("passing_score_percent");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("slug");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_quizzes");
+
+                    b.HasIndex("ModuleId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_quizzes_module_id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasDatabaseName("ix_quizzes_slug");
+
+                    b.ToTable("quizzes", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_quizzes_passing_score", "passing_score_percent BETWEEN 1 AND 100");
+                        });
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.QuizAttempt", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("Passed")
+                        .HasColumnType("boolean")
+                        .HasColumnName("passed");
+
+                    b.Property<Guid>("QuizId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("quiz_id");
+
+                    b.Property<decimal>("ScorePercent")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("score_percent");
+
+                    b.Property<DateTimeOffset>("SubmittedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("submitted_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_quiz_attempts");
+
+                    b.HasIndex("QuizId")
+                        .HasDatabaseName("ix_quiz_attempts_quiz_id");
+
+                    b.HasIndex("UserId", "QuizId", "SubmittedAt")
+                        .HasDatabaseName("ix_quiz_attempts_user_id_quiz_id_submitted_at");
+
+                    b.ToTable("quiz_attempts", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_quiz_attempts_score", "score_percent BETWEEN 0 AND 100");
+                        });
+                });
+
             modelBuilder.Entity("Academy.Api.Modules.Catalog.Domain.Course", b =>
                 {
                     b.Property<Guid>("Id")
@@ -765,6 +1003,78 @@ namespace Academy.Api.Infrastructure.Persistence.Migrations
                     b.ToTable("course_technologies", (string)null);
                 });
 
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.AttemptAnswer", b =>
+                {
+                    b.HasOne("Academy.Api.Modules.Assessments.QuizAttempt", null)
+                        .WithMany("Answers")
+                        .HasForeignKey("AttemptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_attempt_answers_quiz_attempts_attempt_id");
+
+                    b.HasOne("Academy.Api.Modules.Assessments.Question", null)
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_attempt_answers_questions_question_id");
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.Question", b =>
+                {
+                    b.HasOne("Academy.Api.Modules.Assessments.Quiz", "Quiz")
+                        .WithMany("Questions")
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_questions_quizzes_quiz_id");
+
+                    b.Navigation("Quiz");
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.QuestionOption", b =>
+                {
+                    b.HasOne("Academy.Api.Modules.Assessments.Question", "Question")
+                        .WithMany("Options")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_question_options_questions_question_id");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.Quiz", b =>
+                {
+                    b.HasOne("Academy.Api.Modules.Catalog.Domain.CourseModule", "Module")
+                        .WithMany()
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_quizzes_course_modules_module_id");
+
+                    b.Navigation("Module");
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.QuizAttempt", b =>
+                {
+                    b.HasOne("Academy.Api.Modules.Assessments.Quiz", "Quiz")
+                        .WithMany()
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_quiz_attempts_quizzes_quiz_id");
+
+                    b.HasOne("Academy.Api.Modules.Identity.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_quiz_attempts_users_user_id");
+
+                    b.Navigation("Quiz");
+                });
+
             modelBuilder.Entity("Academy.Api.Modules.Catalog.Domain.Course", b =>
                 {
                     b.HasOne("Academy.Api.Modules.Catalog.Domain.School", "School")
@@ -921,6 +1231,21 @@ namespace Academy.Api.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_course_technologies_technologies_technologies_id");
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.Question", b =>
+                {
+                    b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.Quiz", b =>
+                {
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("Academy.Api.Modules.Assessments.QuizAttempt", b =>
+                {
+                    b.Navigation("Answers");
                 });
 
             modelBuilder.Entity("Academy.Api.Modules.Catalog.Domain.Course", b =>

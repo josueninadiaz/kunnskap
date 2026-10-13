@@ -1,0 +1,82 @@
+slug: cuestionario-tu-primer-programa
+title: Comprueba lo que aprendiste en el módulo 1
+passingScore: 70
+questions:
+  - id: que-es-un-programa
+    type: single
+    prompt: ¿Qué es un programa?
+    options:
+      - text: Un conjunto de instrucciones precisas que la computadora sigue para resolver una tarea.
+        correct: true
+      - text: Una máquina que entiende lo que queremos aunque no se lo digamos con precisión.
+      - text: Un archivo que se ejecuta solo, sin necesidad de ninguna herramienta.
+    explanation: Un programa es una lista de instrucciones precisas. La computadora no interpreta lo que quisimos decir; hace exactamente lo que está escrito.
+    hint: Recuerda el ejemplo de la receta de cocina y por qué «sal al gusto» no le sirve a una computadora.
+    lesson: que-es-programar
+
+  - id: sdk-o-runtime
+    type: single
+    prompt: Para crear y ejecutar tus propios programas de C#, ¿qué tienes que instalar?
+    options:
+      - text: El SDK de .NET.
+        correct: true
+      - text: Solo el Runtime de .NET.
+      - text: Un procesador de textos como Word.
+    explanation: El SDK incluye las herramientas para traducir (compilar) y ejecutar tu código. El Runtime solo ejecuta programas que ya están creados.
+    hint: Uno de los dos solo sirve para ejecutar programas ya hechos.
+    lesson: prepara-tu-entorno
+
+  - id: comando-ejecutar
+    type: short
+    prompt: Escribe el comando completo para ejecutar el archivo `hola.cs`.
+    answers: ["dotnet run hola.cs"]
+    explanation: "`dotnet run hola.cs` le pide a .NET que compile el archivo y lo ejecute."
+    hint: Empieza por el nombre de la herramienta, `dotnet`, y termina con el nombre del archivo.
+    lesson: tu-primer-programa
+
+  - id: partes-de-la-instruccion
+    type: multiple
+    prompt: "En `Console.WriteLine(\"¡Hola, mundo!\");`, ¿qué afirmaciones son ciertas? Marca todas las correctas."
+    options:
+      - text: El texto entre comillas es una cadena de texto.
+        correct: true
+      - text: El punto y coma marca el final de la instrucción.
+        correct: true
+      - text: "`console.writeline`, todo en minúsculas, funciona igual."
+      - text: "`WriteLine` escribe una línea de texto en la consola."
+        correct: true
+    explanation: Las comillas delimitan la cadena de texto, el punto y coma cierra la instrucción y `WriteLine` escribe una línea. C# distingue mayúsculas y minúsculas, así que `console.writeline` no funciona.
+    hint: Hay tres afirmaciones correctas. Piensa en qué pasa si cambias mayúsculas por minúsculas.
+    lesson: tu-primer-programa
+
+  - id: orden-de-ejecucion
+    type: single
+    prompt: Un programa tiene tres líneas con `Console.WriteLine`. ¿En qué orden se ejecutan?
+    options:
+      - text: De arriba abajo, en el orden en que están escritas.
+        correct: true
+      - text: De abajo arriba.
+      - text: En un orden distinto cada vez.
+    explanation: Las instrucciones se ejecutan en orden, de arriba abajo. Si cambias el orden de las líneas, cambia el orden de la salida.
+    hint: Prueba a cambiar el orden de las líneas de tu `presentacion.cs` y fíjate en la salida.
+    lesson: tu-primer-programa
+
+  - id: codigo-de-error
+    type: short
+    prompt: "Al ejecutar un programa aparece `hola.cs(1,26): error CS1002: Se esperaba ;`. ¿Cuál es el código del error?"
+    answers: ["CS1002"]
+    explanation: El código es CS1002. Es igual en cualquier idioma, por eso es lo mejor para buscar ayuda.
+    hint: El código empieza por CS y va seguido de cuatro números.
+    lesson: cuando-algo-falla
+
+  - id: primer-error
+    type: single
+    prompt: Si al ejecutar aparecen varios errores a la vez, ¿qué conviene hacer?
+    options:
+      - text: Corregir el primero y volver a ejecutar.
+        correct: true
+      - text: Corregir primero el último.
+      - text: Borrar el archivo y empezar de nuevo.
+    explanation: A menudo un solo error provoca otros. Al corregir el primero, los demás suelen desaparecer.
+    hint: Recuerda el ejemplo de las comillas sin cerrar, que provocaba tres errores.
+    lesson: cuando-algo-falla

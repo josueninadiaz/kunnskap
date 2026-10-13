@@ -61,7 +61,12 @@ export interface CourseDetail {
   softwareVersions: string[]
   lastReviewedAt: string | null
   technologies: Technology[]
-  modules: { title: string; summary: string; lessons: { slug: string; title: string; estimatedMinutes: number }[] }[]
+  modules: {
+    title: string
+    summary: string
+    lessons: { slug: string; title: string; estimatedMinutes: number }[]
+    quiz: { slug: string; title: string; questionCount: number } | null
+  }[]
   contentComplete: boolean
 }
 
