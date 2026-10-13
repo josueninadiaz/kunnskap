@@ -17,6 +17,11 @@ export default defineConfig({
       '/api': { target: apiTarget, changeOrigin: false },
     },
   },
+  build: {
+    // El fragmento más grande es la escena 3D (three.js), que se descarga bajo demanda solo en
+    // equipos con WebGL que no piden reducir el movimiento ni ahorrar datos.
+    chunkSizeWarningLimit: 600,
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],

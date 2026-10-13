@@ -57,6 +57,12 @@
   --stage-accent: #6fe3b4;
   --stage-border: rgb(255 255 255 / 0.12);
 
+  /* Violeta oficial de .NET (guías de marca de dotnet/brand): solo para identificar tecnología .NET. */
+  --dotnet: #512bd4;
+  --dotnet-bright: #a594ff;
+  /* Texto en violeta .NET legible sobre el fondo del tema (7,3:1 claro; 7:1 oscuro). */
+  --dotnet-text: #512bd4;
+
   color-scheme: light;
 }
 
@@ -83,6 +89,7 @@
     --focus: #93ecc8;
     --header: rgb(7 13 21 / 0.74);
     --band: #0d1622;
+    --dotnet-text: #a594ff;
     --code-bg: #0c1622;
     --code-fg: #e3eaf2;
     --code-keyword: #f29cc6;
@@ -117,6 +124,7 @@
   --focus: #93ecc8;
   --header: rgb(7 13 21 / 0.74);
     --band: #0d1622;
+    --dotnet-text: #a594ff;
     --code-bg: #0c1622;
     --code-fg: #e3eaf2;
     --code-keyword: #f29cc6;
@@ -163,6 +171,9 @@
   --color-stage-muted: var(--stage-muted);
   --color-stage-accent: var(--stage-accent);
   --color-stage-border: var(--stage-border);
+  --color-dotnet: var(--dotnet);
+  --color-dotnet-bright: var(--dotnet-bright);
+  --color-dotnet-text: var(--dotnet-text);
   --shadow-soft: var(--shadow);
 }
 
@@ -288,5 +299,46 @@
   }
   to {
     clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Paquete de datos que recorre el conector entre capas de la arquitectura. */
+@keyframes flow-x {
+  from {
+    transform: translateX(-1.75rem);
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(1.75rem);
+    opacity: 0;
+  }
+}
+
+@keyframes flow-y {
+  from {
+    transform: translateY(-1.1rem);
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(1.1rem);
+    opacity: 0;
   }
 }

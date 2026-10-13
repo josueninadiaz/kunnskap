@@ -13,7 +13,7 @@ describe('aplicación', () => {
   it('muestra la página de inicio con el nombre configurable y el aviso de no acreditación', async () => {
     renderRoute('/')
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Tu primer programa empieza aquí.' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Aprende a programar con C# y .NET. Gratis y desde cero.' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: new RegExp(config.platformName) })).toHaveAttribute('href', '/')
     expect(screen.getByText(/no es una institución acreditada/i)).toBeInTheDocument()
   })
